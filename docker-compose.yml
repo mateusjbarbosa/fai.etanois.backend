@@ -8,7 +8,7 @@ services:
     environment: 
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=ts_api
+      - POSTGRES_DB=etanois
     volumes:
       - "postgres-data:/data/postgres"
       - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
