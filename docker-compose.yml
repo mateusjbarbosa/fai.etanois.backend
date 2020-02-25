@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment: 
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=ts_api
+    volumes:
+      - "postgres-data:/data/postgres"
+      - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+    networks: 
+      - etanois-network
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    depends_on:
+      - postgres
+    networks:
+      - etanois-network
+
+networks: 
+  etanois-network:
+    driver: bridge
+
+volumes: 
+  postgres-data:
