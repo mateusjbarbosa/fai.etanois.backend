@@ -2,9 +2,9 @@
   "name": "etanois-api",
   "version": "1.0.0",
   "description": "API para servir a aplicação mobile e web.",
-  "main": "./server/server.ts",
+  "main": "./bootstrap.ts",
   "scripts": {
-    "start": "NODE_ENV=development ./node_modules/.bin/ts-node ./server/server.ts",
+    "start": "NODE_ENV=development ./node_modules/.bin/ts-node ./bootstrap.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
