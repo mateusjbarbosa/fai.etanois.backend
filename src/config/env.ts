@@ -20,7 +20,7 @@ export class Envorimment {
       username: "postgres",
       password: "postgres",
       database: "etanois",
-      host: "127.0.0.0",
+      host: "127.0.0.1",
       dialect: "postgres",
     },
     serverPort: "80"
@@ -30,7 +30,7 @@ export class Envorimment {
       username: "postgres",
       password: "postgres",
       database: "etanois_test",
-      host: "127.0.0.0",
+      host: "127.0.0.1",
       dialect: "postgres",
     },
     serverPort: "80"
