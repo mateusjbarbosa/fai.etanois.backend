@@ -1,6 +1,6 @@
 import { Application} from 'express';
 import { RouterModuleFactory} from './router-map';
-import { HttpVerbMap, FeatureModuleRouterInfo } from './base-routes-module';
+import { HttpVerbMap, FeatureModuleRouterInfo, ModuleEndpointMap } from './base-routes-module';
 
 export class RouterModule {
   private routerFactory: RouterModuleFactory;
@@ -12,10 +12,13 @@ export class RouterModule {
   }
 
   public exposeRoutes(authenticate?: Function): void {
-    const registratedModules=  this.routerFactory.getRegisteredModules();
+    const registratedModules: ModuleEndpointMap[] =  this.routerFactory.getRegisteredModules();
 
     if(registratedModules && Array.isArray(registratedModules)) {
-      registratedModules.forEach(this.extractRouterInfoFromModule.bind(this, authenticate));
+      registratedModules.forEach((module)  => {
+        const moduleName: string = Object.keys(module)[0];
+        this.extractRouterInfoFromModule(authenticate, module[moduleName]);
+      });
     }
   }
 

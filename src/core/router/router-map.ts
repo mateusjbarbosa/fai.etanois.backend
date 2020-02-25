@@ -19,11 +19,7 @@ export class RouterModuleFactory {
     return new moduleName()[parser]();
   }
 
-  public getRegisteredModules() {
-    return this.routerModulesMap.map((routerModule: ModuleEndpointMap) => {
-      const moduleName: string = Object.keys(routerModule)[0];
-      
-      return moduleName;
-    });
+  public getRegisteredModules(): ModuleEndpointMap[] {
+    return this.routerModulesMap;
   }
 }

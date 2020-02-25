@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import HttpStatus from 'http-status';
+import * as HttpStatus from 'http-status';
 
 export interface FeatureModuleRouterInfo {
   endpoint: string,
