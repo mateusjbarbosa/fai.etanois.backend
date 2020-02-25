@@ -11,7 +11,6 @@ export class Server {
 
   upServer(): void {
     this.server = http.createServer(Api);
-    console.log(Configuration)
     this.server.listen(Configuration.serverPort);
     this.server.on('listening', () => {
       let address: any = this.server.address();
