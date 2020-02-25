@@ -3,7 +3,7 @@ import { Application, Request, Response, NextFunction } from 'express';
 import * as morgan from 'morgan';
 import * as bodyParser from 'body-parser';
 
-class Api {
+export class CoreModule {
   private express: Application;
 
   constructor() {
@@ -18,7 +18,7 @@ class Api {
     this.express.use(bodyParser.json());
   }
 
-  getApplication(): Application {
+  public getApplication(): Application {
     return this.express;
   }
 
@@ -29,5 +29,3 @@ class Api {
     next();
   }
 }
-
-export default new Api().getApplication();

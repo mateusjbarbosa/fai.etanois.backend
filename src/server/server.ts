@@ -1,20 +1,23 @@
 import * as http from "http";
-import Api from '../api/api';
 import Configuration from '../config/config';
+import { CoreModule } from '../core/core';
+import { Application } from 'express';
 
 export class Server {
   private server: http.Server;
   private db;
+  private express: Application;
 
   constructor(databaseConnector) {
     if (databaseConnector) {
       this.db = databaseConnector;
+      this.express = new CoreModule().getApplication();
       this.syncDatabase();
     }
   }
 
   upServer(): void {
-    this.server = http.createServer(Api);
+    this.server = http.createServer(this.express);
     this.server.listen(Configuration.serverPort);
     this.server.on('listening', () => {
       let address: any = this.server.address();
