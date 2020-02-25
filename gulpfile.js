@@ -16,4 +16,8 @@ gulp.task('compile', gulp.series('clean', function() {
     .js.pipe(gulp.dest('dist'))
 }));
 
-gulp.task('default', gulp.series('compile'));
+gulp.task('watch:src', function() {
+  gulp.watch('./src/**/*.ts', gulp.series('compile'));
+})
+
+gulp.task('default', gulp.series('watch:src'));
