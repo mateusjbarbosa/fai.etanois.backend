@@ -1,11 +1,7 @@
 import { BaseRouterModule, ModuleEndpointMap } from '../../core/router/base-routes-module'
-import { Request, Response } from 'express';
 import UserController from './user.controller';
-import * as HttpStatus from 'http-status';
 
 export class UserRouterModule extends BaseRouterModule {
-  private baseEndpoint: string = `${this.context}/${this.version}/${this.moduleName}/`;
-
   constructor() {
     super('user');
   }
@@ -46,9 +42,5 @@ export class UserRouterModule extends BaseRouterModule {
         }
       ]
     }
-  }
-
-  controller(req: Request, res: Response) {
-    return res.sendStatus(HttpStatus.OK);
   }
 }
