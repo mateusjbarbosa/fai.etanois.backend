@@ -1,19 +1,16 @@
-import { IUser, IUserDetail, createUsers, create } from './user.module';
+import { IUserDetail, createUsers, create } from './user.module';
 import * as Bluebird from 'bluebird';
 const model = require('../../entities');
 
 class User {
 
-  constructor() {
-
-  }
+  constructor() {}
 
   create(user: any){
-    return model.User.create(user)
-    .then(create);
+    return model.User.create(user);
   }
   
-  getAll(): Bluebird<IUser[]>{
+  getAll(): Bluebird<IUserDetail[]>{
     return model.User.findAll({
       order: ['name']
     })
@@ -37,7 +34,7 @@ class User {
   update(id: number, user: any){
     return model.User.update(user, {
       where: {id},
-      fields: ['name', 'email', 'phone_number', 'password'],
+      fields: ['name', 'email', 'phone_number', 'password', 'payment_mode'],
       hooks: true,
       individualHooks: true
     });
