@@ -33,6 +33,7 @@ class UserController {
     
     User.update(userId, props)
     .then(_.partial(Handlers.onSuccess, res))
+    .catch(_.partial(Handlers.dbErrorHandler, res))
     .catch(_.partial(Handlers.onError, res, 'Error updating user'));
   }
 

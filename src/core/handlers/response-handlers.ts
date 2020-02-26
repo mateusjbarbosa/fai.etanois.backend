@@ -40,11 +40,20 @@ class Handlers {
   }
 
   dbErrorHandler(res: Response, err: any) {
+    let errors: string[] = new Array();
     console.log(`Db error: ${err}`)
+
+    if (err.errors) {
+      err.errors.forEach(element => {
+        if (element.message) {
+          errors.push(element.message);
+        }
+      });
+    }
 
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       code: 'ERR-002',
-      message: 'DB error'
+      message: errors
     });
   }
 }
