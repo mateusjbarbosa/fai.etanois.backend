@@ -12,7 +12,8 @@ export default function (sequelize, DataTypes) {
       allowNull: true,
       unique: true,
       validate: {
-        notEmpty: true
+        notEmpty: true,
+        len: [15, 100],
       }
     },
     phone_number: {
@@ -39,7 +40,7 @@ export default function (sequelize, DataTypes) {
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [6, 50],
+        len: [6, 30],
         notNull: {
           msg: 'Password is required'
         }
