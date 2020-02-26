@@ -57,13 +57,13 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: true
+        notEmpty: true,
+        isIn: 
+        {
+          args: [['money', 'credit_car', 'both']],
+          msg: 'Invalid payment format'
+        }
       },
-      isIn: 
-      {
-        args: [['money', 'credit_car', 'both']],
-        msg: 'Invalid payment format'
-      }
     }
   });
 
