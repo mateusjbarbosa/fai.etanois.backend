@@ -21,6 +21,6 @@ export function create(user: IUserDetail): IUserDetail {
   return user;
 }
 
-export function createUsers(data: any[]): IUserDetail[] {
+export function createUsers(data: any[]): IUser[] {
   return data.map(create);
 }

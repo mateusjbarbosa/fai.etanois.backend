@@ -8,12 +8,12 @@ export default function (sequelize, DataTypes) {
       autoIncrement: true
     },
     email: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: true,
       unique: true,
       validate: {
         notEmpty: true,
-        len: [15, 100],
+        len: [10, 100],
       }
     },
     phone_number: {
@@ -25,7 +25,7 @@ export default function (sequelize, DataTypes) {
       }
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50),
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -40,7 +40,6 @@ export default function (sequelize, DataTypes) {
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [6, 30],
         notNull: {
           msg: 'Password is required'
         }

@@ -10,6 +10,7 @@ export interface IEnvorimment {
   envorimmentName: string;
   serverPort: string;
   database: IDatabaseEnvorimmet;
+  secret: string
 }
 
 export class Envorimment {
@@ -23,7 +24,8 @@ export class Envorimment {
       host: "127.0.0.1",
       dialect: "postgres",
     },
-    serverPort: "80"
+    serverPort: "80",
+    secret: 'S3CR3T'
   },{
     envorimmentName: "test",
     database: {
@@ -33,7 +35,8 @@ export class Envorimment {
       host: "127.0.0.1",
       dialect: "postgres",
     },
-    serverPort: "80"
+    serverPort: "80",
+    secret: 'S3CR3T'
   }];
   
   private envorimment: string

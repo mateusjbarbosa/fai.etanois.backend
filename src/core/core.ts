@@ -3,6 +3,7 @@ import { Application, Request, Response, NextFunction } from 'express';
 import { RouterModule } from './router/routes';
 import * as morgan from 'morgan';
 import * as bodyParser from 'body-parser';
+import Handlers from './handlers/response-handlers';
 
 export class CoreModule {
   private express: Application;
@@ -19,6 +20,7 @@ export class CoreModule {
     this.express.use(this.configHeaders.bind(this));
     this.express.use(morgan('dev'));
     this.express.use(bodyParser.urlencoded({ extended: true }));
+    this.express.use(Handlers.errorHandlerApi);
     this.express.use(bodyParser.json());
   }
 

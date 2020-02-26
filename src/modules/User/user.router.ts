@@ -22,7 +22,7 @@ export class UserRouterModule extends BaseRouterModule {
           isProtected: false
         },
         {
-          endpoint: this.baseEndpoint + 'all',
+          endpoint: this.baseEndpoint,
           callback: UserController.readAll,
           isProtected: false
         }
