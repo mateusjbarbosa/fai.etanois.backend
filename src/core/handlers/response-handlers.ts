@@ -6,15 +6,16 @@ import Configuration from '../../config/config';
 
 class Handlers {
   authFail(req: Request, res: Response) {
+    
     res.sendStatus(HttpStatus.UNAUTHORIZED);
   }
 
-  authSuccess(res: Response, credentials: any, data: any) {
-    const isMatch = bcrypt.compareSync(credentials.password, data.password);
+  authSuccess(res: Response, password: any, data: any) {
+    const isMatch = bcrypt.compareSync(password, data.password);
   
     if (isMatch) {
       const payload = {id: data.id};
-      res.json({
+      res.status(HttpStatus.OK).json({
         token: jwt.encode(payload, Configuration.secret)
       });
     } else {

@@ -18,7 +18,7 @@ class UserController {
 
     User.getById(userId)
     .then(_.partial(Handlers.onSuccess, res))
-    .catch(_.partial(Handlers.onSuccess, res, 'User not found'));
+    .catch(_.partial(Handlers.onError, res, 'User not found'));
   }
 
   public readAll(req: Request, res: Response) {

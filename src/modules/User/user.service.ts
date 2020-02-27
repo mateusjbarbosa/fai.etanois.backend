@@ -1,4 +1,4 @@
-import { IUserDetail, createUsers, create } from './user.module';
+import { IUser, IUserDetail, createUsers, create, getUserForAuthorization } from './user.module';
 import * as Bluebird from 'bluebird';
 const model = require('../../entities');
 
@@ -24,11 +24,11 @@ class User {
     .then(create);
   }
 
-  getByEmail(email: string): Bluebird<IUserDetail>{
+  getUserForAuthorization(email: string) {
     return model.User.findOne({
       where: {email}
     })
-    .then(create);
+    .then(getUserForAuthorization);
   }
 
   update(id: number, user: any){

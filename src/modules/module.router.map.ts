@@ -1,4 +1,5 @@
 import { UserRouterModule } from "./User/user.router";
+import { AuthRouterModule } from "./Auth/auth.router";
 
 export interface FeatureModuleRouter {
   moduleName: any;
@@ -9,6 +10,10 @@ export class ModulesRouterMapper {
   public registeredModules: Array<FeatureModuleRouter> = [
     {
       moduleName: UserRouterModule,
+      parser: 'getRoutesFromModules'
+    },
+    {
+      moduleName: AuthRouterModule,
       parser: 'getRoutesFromModules'
     }
   ];

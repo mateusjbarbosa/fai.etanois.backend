@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Application, Request, Response, NextFunction } from 'express';
 import { RouterModule } from './router/routes';
+import AuthService from '../modules/Auth/auth.service';
 import * as morgan from 'morgan';
 import * as bodyParser from 'body-parser';
 import Handlers from './handlers/response-handlers';
@@ -20,8 +21,9 @@ export class CoreModule {
     this.express.use(this.configHeaders.bind(this));
     this.express.use(morgan('dev'));
     this.express.use(bodyParser.urlencoded({ extended: true }));
-    this.express.use(Handlers.errorHandlerApi);
     this.express.use(bodyParser.json());
+    this.express.use(Handlers.errorHandlerApi);
+    this.express.use(AuthService.initialize());
   }
 
   public getApplication(): Application {
@@ -29,7 +31,7 @@ export class CoreModule {
   }
 
   private router(): void {
-    this.routerModule.exposeRoutes();
+    this.routerModule.exposeRoutes(AuthService.authenticate);
   }
 
   private configHeaders(req: Request, res: Response, next: NextFunction) {

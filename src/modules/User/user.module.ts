@@ -9,6 +9,7 @@ export interface IUser {
 }
 
 export interface IUserDetail {
+  readonly id: number,
   phone_number: string,
   email: string,
   name: string,
@@ -16,8 +17,12 @@ export interface IUserDetail {
   payment_mode: string
 }
 
-export function create({phone_number, email, name, cep, payment_mode}): IUserDetail {
-  return {phone_number, email, name, cep, payment_mode};
+export function create({id, phone_number, email, name, cep, payment_mode}): IUserDetail {
+  return {id, phone_number, email, name, cep, payment_mode};
+}
+
+export function getUserForAuthorization({password, id}): any {
+  return {password, id};
 }
 
 export function createUsers(data: any[]): IUserDetail[] {
