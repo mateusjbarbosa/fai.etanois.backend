@@ -1,5 +1,6 @@
 import { BaseRouterModule, ModuleEndpointMap } from '../../core/router/base-routes-module'
 import UserController from './user.controller';
+import { EUserRoles } from './user.module';
 
 export class UserRouterModule extends BaseRouterModule {
   constructor() {
@@ -24,21 +25,24 @@ export class UserRouterModule extends BaseRouterModule {
         {
           endpoint: this.baseEndpoint,
           callback: UserController.readAll,
-          isProtected: false
+          isProtected: true,
+          allowedRoles: [EUserRoles.ADMIN]
         }
       ],
       patch: [
         {
           endpoint: this.baseEndpoint + ':id',
           callback: UserController.update,
-          isProtected: false
+          isProtected: false,
+          
         }
       ],
       delete: [
         {
           endpoint: this.baseEndpoint + ':id',
           callback: UserController.delete,
-          isProtected: false
+          isProtected: true,
+          allowedRoles: [EUserRoles.ADMIN]
         }
       ]
     }

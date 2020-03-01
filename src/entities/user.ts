@@ -95,6 +95,20 @@ export default function (sequelize, DataTypes) {
           msg: 'Payment format is required'
         }
       },
+    },
+    role: {
+      type: DataTypes.STRING,
+      validate: {
+        notEmpty: {
+          arg: true,
+          msg: 'Role cannot be empty'
+        },
+        isIn: {
+          args: [['admin', 'driver', 'attendant', 'gas_station_owner']],
+          msg: 'Unrecognized role'
+        }
+      },
+      defaultValue: 'driver'
     }
   });
 

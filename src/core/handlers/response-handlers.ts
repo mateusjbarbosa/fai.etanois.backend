@@ -6,7 +6,6 @@ import Configuration from '../../config/config';
 
 class Handlers {
   authFail(req: Request, res: Response) {
-    
     res.sendStatus(HttpStatus.UNAUTHORIZED);
   }
 
@@ -14,7 +13,7 @@ class Handlers {
     const isMatch = bcrypt.compareSync(password, data.password);
   
     if (isMatch) {
-      const payload = {id: data.id};
+      const payload = {id: data.id, password: data.password, email: data.email};
       res.status(HttpStatus.OK).json({
         token: jwt.encode(payload, Configuration.secret)
       });

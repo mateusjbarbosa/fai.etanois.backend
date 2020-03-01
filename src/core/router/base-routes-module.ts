@@ -1,10 +1,12 @@
 import { Response, Request } from "express";
 import * as HttpStatus from 'http-status';
+import { EUserRoles } from "../../modules/User/user.module";
 
 export interface FeatureModuleRouterInfo {
   endpoint: string,
   callback: Function,
-  isProtected: boolean
+  isProtected: boolean,
+  allowedRoles?: EUserRoles[]
 }
 
 export interface HttpVerbMap {

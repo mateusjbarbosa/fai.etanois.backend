@@ -1,3 +1,10 @@
+export enum EUserRoles {
+  ADMIN = 'admin',
+  DRIVER = 'driver',
+  ATTENDANT = 'attendant',
+  GAS_STATION_OWNER = 'gas_station_owner'
+}
+
 export interface IUser {
   readonly id: number,
   phone_number: string,
@@ -5,7 +12,8 @@ export interface IUser {
   name: string,
   password: string,
   cep: string,
-  payment_mode: string
+  payment_mode: string,
+  role: EUserRoles
 }
 
 export interface IUserDetail {
@@ -17,12 +25,18 @@ export interface IUserDetail {
   payment_mode: string
 }
 
-export function create({id, phone_number, email, name, cep, payment_mode}): IUserDetail {
-  return {id, phone_number, email, name, cep, payment_mode};
+export function create(user: any): IUserDetail {
+  if (user) {
+    const {id, phone_number, email, name, cep, payment_mode} = user;
+
+    return {id, phone_number, email, name, cep, payment_mode};
+  }
+
+  return null
 }
 
-export function getUserForAuthorization({password, id}): any {
-  return {password, id};
+export function getUserForAuthorization({email, password, id}): any {
+  return {email, password, id};
 }
 
 export function createUsers(data: any[]): IUserDetail[] {

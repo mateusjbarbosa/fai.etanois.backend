@@ -11,9 +11,9 @@ class AuthService {
     };
 
     passport.use(new Strategy(opts, (jwtPayload, done) => {
-      console.log(jwtPayload)
-      User.getById(jwtPayload.id).then(user => {
-        if (user) {
+
+      User.getUserForAuthorization(jwtPayload.email).then(user => {
+        if (user && (user.password == jwtPayload.password) && (user.id == jwtPayload.id)) {
           return done(null, {
             id: user.id,
             email: user.email
