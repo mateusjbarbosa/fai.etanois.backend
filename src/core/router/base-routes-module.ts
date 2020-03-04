@@ -5,8 +5,7 @@ import { EUserRoles } from "../../modules/User/user.module";
 export interface FeatureModuleRouterInfo {
   endpoint: string,
   callback: Function,
-  isProtected: boolean,
-  allowedRoles?: EUserRoles[]
+  isProtected: boolean
 }
 
 export interface HttpVerbMap {

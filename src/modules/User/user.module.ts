@@ -35,8 +35,8 @@ export function create(user: any): IUserDetail {
   return null
 }
 
-export function getUserForAuthorization({email, password, id}): any {
-  return {email, password, id};
+export function getUserForAuthorization({email, password, id, role}): any {
+  return {email, password, id, role};
 }
 
 export function createUsers(data: any[]): IUserDetail[] {

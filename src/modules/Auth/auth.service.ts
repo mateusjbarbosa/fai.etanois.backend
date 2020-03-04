@@ -2,6 +2,7 @@ import * as passport from 'passport';
 import { Strategy, ExtractJwt} from 'passport-jwt';
 import User from '../User/user.service'
 import Configuration from '../../config/config';
+import { EUserRoles } from '../User/user.module';
 
 class AuthService {
   config() {
@@ -16,7 +17,8 @@ class AuthService {
         if (user && (user.password == jwtPayload.password) && (user.id == jwtPayload.id)) {
           return done(null, {
             id: user.id,
-            email: user.email
+            email: user.email,
+            role: user.role
           });
         }
   

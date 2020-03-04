@@ -20,13 +20,12 @@ export class UserRouterModule extends BaseRouterModule {
         {
           endpoint: this.baseEndpoint + ':id',
           callback: UserController.readOnly,
-          isProtected: false
+          isProtected: true
         },
         {
           endpoint: this.baseEndpoint,
           callback: UserController.readAll,
-          isProtected: true,
-          allowedRoles: [EUserRoles.ADMIN]
+          isProtected: true
         }
       ],
       patch: [
@@ -41,8 +40,7 @@ export class UserRouterModule extends BaseRouterModule {
         {
           endpoint: this.baseEndpoint + ':id',
           callback: UserController.delete,
-          isProtected: true,
-          allowedRoles: [EUserRoles.ADMIN]
+          isProtected: true
         }
       ]
     }
