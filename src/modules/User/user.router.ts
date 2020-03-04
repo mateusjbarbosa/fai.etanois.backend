@@ -32,7 +32,7 @@ export class UserRouterModule extends BaseRouterModule {
         {
           endpoint: this.baseEndpoint + ':id',
           callback: UserController.update,
-          isProtected: false,
+          isProtected: true,
           
         }
       ],
