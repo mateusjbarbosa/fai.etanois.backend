@@ -22,9 +22,11 @@ class Handlers {
     }
   }
 
-  onError(res: Response, menssage: string, err: any) {
-    console.log(`Error: ${err}`);
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ payload: menssage });
+  onError(res: Response, menssage: string) {
+    res.status(HttpStatus.PRECONDITION_FAILED).json({ 
+      code: 'ERR-03',
+      menssage: [menssage]
+    });
   }
 
   onSuccess(res: Response, data: any) {
@@ -34,8 +36,8 @@ class Handlers {
   errorHandlerApi(err: ErrorRequestHandler, req: Request, res: Response, next: NextFunction) {
     console.log(`API error handler was executed: ${err}`);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      errorCode: 'ERR-001',
-      message: 'Internal error'
+      code: 'ERR-001',
+      message: ['Internal error']
     });
   }
 
@@ -51,9 +53,9 @@ class Handlers {
       });
     }
 
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    res.status(HttpStatus.PRECONDITION_FAILED).json({
       code: 'ERR-002',
-      message: errors
+      menssage: errors
     });
   }
 }

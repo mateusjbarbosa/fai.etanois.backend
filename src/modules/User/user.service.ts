@@ -6,8 +6,12 @@ class User {
 
   constructor() {}
 
-  create(user: any){
-    return model.User.create(user);
+  create(user: any): Promise<any>{
+    if (user.phone_number || user.email) {
+      return model.User.create(user);
+    } else {
+      throw new Error('Phone number or email is required').message;
+    }
   }
   
   getAll(): Bluebird<IUserDetail[]>{

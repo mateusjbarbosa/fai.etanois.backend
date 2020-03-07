@@ -32,7 +32,7 @@ export class AuthRouterModule extends BaseRouterModule {
         ResponseHandlers.authFail(req, res);
       }
     } else {
-      ResponseHandlers.onError(res, 'E-mai and password are required', 'no-credentials');
+      ResponseHandlers.onError(res, 'E-mai and password are required');
     }
   }
 }

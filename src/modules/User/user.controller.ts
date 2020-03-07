@@ -8,10 +8,13 @@ class UserController {
   constructor() {}
 
   public create = (req: Request, res: Response) => {
-    User.create(req.body)
-    .then(_.partial(Handlers.onSuccess, res))
-    .catch(_.partial(Handlers.dbErrorHandler, res))
-    .catch(_.partial(Handlers.onError, res, 'Error inserting new user'));
+    try {
+      User.create(req.body)
+      .then(_.partial(Handlers.onSuccess, res))
+      .catch(_.partial(Handlers.dbErrorHandler, res))
+    } catch(error) {
+      Handlers.onError(res, error);
+    }
   }
 
   public readOnly = (req: Request, res: Response) => {
