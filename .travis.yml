@@ -14,8 +14,6 @@ before_script:
   - psql -c 'create database ts_api_test;' -U postgres
   - npm i -g sequelize-cli gulp-cli
   - cd src/
-  - mkdir migrations
-  - sequelize db:migrate --env test
   - npm install
   - gulp
 script:
