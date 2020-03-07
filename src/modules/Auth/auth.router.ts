@@ -1,6 +1,6 @@
 import { BaseRouterModule, ModuleEndpointMap } from '../../core/router/base-routes-module'
 import { Request, Response } from 'express';
-import User from '../user/user.service';
+import User from '../User/user.service';
 import ResponseHandlers from '../../core/handlers/response-handlers';
 
 export class AuthRouterModule extends BaseRouterModule {

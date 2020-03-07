@@ -1,6 +1,5 @@
 import { BaseRouterModule, ModuleEndpointMap } from '../../core/router/base-routes-module'
 import UserController from './user.controller';
-import { EUserRoles } from './user.module';
 
 export class UserRouterModule extends BaseRouterModule {
   constructor() {
