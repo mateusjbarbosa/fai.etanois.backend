@@ -7,13 +7,13 @@ export enum EUserRoles {
 
 export interface IUser {
   readonly id: number,
-  phone_number: string,
-  email: string,
+  phone_number?: string,
+  email?: string,
   name: string,
   password: string,
   cep: string,
   payment_mode: string,
-  role: EUserRoles
+  role?: EUserRoles
 }
 
 export interface IUserDetail {
