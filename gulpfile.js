@@ -10,7 +10,13 @@ gulp.task('clean', function() {
     .pipe(clean());
 });
 
-gulp.task('compile', gulp.series('clean', function() {
+gulp.task('copy-initSql',
+  gulp.series('clean', function() {
+    return gulp.src('./init.sql')
+    .pipe(gulp.dest('./dist/'))
+}));
+
+gulp.task('compile', gulp.series('copy-initSql', function() {
   return tsProject.src()
     .pipe(tsProject())
     .js.pipe(gulp.dest('dist'))
