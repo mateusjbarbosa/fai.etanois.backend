@@ -11,7 +11,7 @@ env:
   - NODE_ENV: test
   - TRAVIS: true
 before_script:
-  - psql -c 'create database ts_api_test;' -U postgres
+  - psql -c 'create database etanois_test;' -U postgres
   - npm i -g sequelize-cli gulp-cli
   - npm install
   - gulp
