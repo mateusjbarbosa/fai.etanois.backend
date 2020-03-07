@@ -20,4 +20,4 @@ gulp.task('watch:src', function() {
   gulp.watch('./src/**/*.ts', gulp.series('compile'));
 })
 
-gulp.task('default', gulp.series('watch:src'));
+gulp.task('default', gulp.series('compile'));
