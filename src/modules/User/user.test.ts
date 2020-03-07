@@ -1,6 +1,6 @@
-import { testDouble, expect } from '../../tests/unit/helpers';
+import { expect } from '../../tests/unit/helpers';
 import User from './user.service';
-import { IUser, EUserRoles } from './user.module';
+import { IUser, EUserRoles, EPaymentMode } from './user.module';
 
 export class UserTest {
   constructor() {}
@@ -16,7 +16,7 @@ export class UserTest {
         password: '1234',
         phone_number: '35984552145',
         cep: '37540000',
-        payment_mode: 'both',
+        payment_mode: EPaymentMode.BOTH,
         role: EUserRoles.ADMIN
       };
     
@@ -43,7 +43,7 @@ export class UserTest {
             email: 'novousuario@email.com',
             password: '1234',
             cep: '37548000',
-            payment_mode: 'credit_card',
+            payment_mode: EPaymentMode.CREDIT_CARD,
           };
     
           return User.create(newUser)

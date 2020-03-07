@@ -1,3 +1,4 @@
+import * as mocha from 'mocha';
  import * as Chai from 'chai';
  import * as td from 'testdouble';
  import { CoreModule } from '../../core/core'

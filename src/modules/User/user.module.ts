@@ -5,6 +5,12 @@ export enum EUserRoles {
   GAS_STATION_OWNER = 'gas_station_owner'
 }
 
+export enum EPaymentMode {
+  BOTH = 'both',
+  MONEY = 'money',
+  CREDIT_CARD = 'credit_card'
+}
+
 export interface IUser {
   readonly id: number,
   phone_number?: string,
@@ -12,7 +18,7 @@ export interface IUser {
   name: string,
   password: string,
   cep: string,
-  payment_mode: string,
+  payment_mode: EPaymentMode,
   role?: EUserRoles
 }
 
