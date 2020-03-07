@@ -2,7 +2,6 @@ import * as passport from 'passport';
 import { Strategy, ExtractJwt} from 'passport-jwt';
 import User from '../User/user.service'
 import Configuration from '../../config/config';
-import { EUserRoles } from '../User/user.module';
 
 class AuthService {
   config() {
