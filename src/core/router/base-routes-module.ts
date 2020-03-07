@@ -1,6 +1,5 @@
 import { Response, Request } from "express";
 import * as HttpStatus from 'http-status';
-import { EUserRoles } from "../../modules/User/user.module";
 
 export interface FeatureModuleRouterInfo {
   endpoint: string,

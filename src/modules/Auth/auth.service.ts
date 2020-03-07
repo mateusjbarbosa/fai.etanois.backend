@@ -1,6 +1,6 @@
 import * as passport from 'passport';
 import { Strategy, ExtractJwt} from 'passport-jwt';
-import User from '../User/user.service'
+import User from '../user/user.service'
 import Configuration from '../../config/config';
 
 class AuthService {

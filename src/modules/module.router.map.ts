@@ -1,5 +1,5 @@
-import { UserRouterModule } from "./User/user.router";
-import { AuthRouterModule } from "./Auth/auth.router";
+import { UserRouterModule } from "./user/user.router";
+import { AuthRouterModule } from "./auth/auth.router";
 
 export interface FeatureModuleRouter {
   moduleName: any;

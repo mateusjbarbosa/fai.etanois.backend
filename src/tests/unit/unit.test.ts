@@ -1,4 +1,4 @@
-import {UserTest} from '../../modules/User/user.test'
+import {UserTest} from '../../modules/user/user.test'
 
 
 class UnitTest {
