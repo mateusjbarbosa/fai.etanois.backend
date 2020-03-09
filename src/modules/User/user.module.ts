@@ -31,6 +31,14 @@ export interface IUserDetail {
   payment_mode: string
 }
 
+export interface IUserForAuthorization {
+  id: number,
+  phone_number?: string,
+  email?: string,
+  password: string,
+  role: EUserRoles
+}
+
 export function create(user: any): IUserDetail {
   if (user) {
     const {id, phone_number, email, name, cep, payment_mode} = user;
@@ -41,8 +49,47 @@ export function create(user: any): IUserDetail {
   return null
 }
 
-export function getUserForAuthorization({email, password, id, role}): any {
-  return {email, password, id, role};
+export function getUserForAuthorization(user: any): IUserForAuthorization {
+  let userAuthoriation: IUserForAuthorization = {
+    id: null,
+    email: null,
+    phone_number: null,
+    password: null,
+    role: null
+  };
+
+  if (user) {
+    const keys = Object.keys(user._previousDataValues);
+
+    keys.forEach(property => {
+      switch (property)
+      {
+        case 'id':
+          userAuthoriation.id = user[property];
+        break;
+
+        case 'phone_number':
+          userAuthoriation.phone_number = user[property];
+        break;
+
+        case 'email':
+          userAuthoriation.email = user[property];
+        break;
+
+        case 'role':
+          userAuthoriation.role = user[property];
+        break;
+
+        case 'password':
+          userAuthoriation.password = user[property];
+        break;
+      }
+    });
+
+    return userAuthoriation;
+  }
+
+  return null;
 }
 
 export function createUsers(data: any[]): IUserDetail[] {

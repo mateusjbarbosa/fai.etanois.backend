@@ -13,7 +13,9 @@ class Handlers {
     const isMatch = bcrypt.compareSync(password, data.password);
   
     if (isMatch) {
-      const payload = {id: data.id, password: data.password, email: data.email};
+      const payload = {id: data.id, password: data.password, email: data.email,
+        phone_number: data.phone_number};
+
       res.status(HttpStatus.OK).json({
         token: jwt.encode(payload, Configuration.secret)
       });

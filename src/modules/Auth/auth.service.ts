@@ -11,11 +11,11 @@ class AuthService {
     };
 
     passport.use(new Strategy(opts, (jwtPayload, done) => {
-
-      User.getUserForAuthorization(jwtPayload.email).then(user => {
+      User.getUserForAuthorization(jwtPayload.email, jwtPayload.phone_number).then(user => {
         if (user && (user.password == jwtPayload.password) && (user.id == jwtPayload.id)) {
           return done(null, {
             id: user.id,
+            phone_number: user.phone_number,
             email: user.email,
             role: user.role
           });
