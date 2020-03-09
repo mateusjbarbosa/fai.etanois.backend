@@ -89,9 +89,7 @@ class UserController {
 
   private verifyUserType = (req: Request, res: Response, role: any, idRequest, idUserLogged) => {
     let authorized: boolean = false
-    console.log(role)
-    console.log(idRequest)
-    console.log(idUserLogged)
+
     if ((role == EUserRoles.ADMIN) || (role == EUserRoles.DRIVER && idRequest == idUserLogged))
     {
       authorized = true;

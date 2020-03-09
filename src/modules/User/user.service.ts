@@ -1,6 +1,7 @@
-import { IUser, IUserDetail, createUsers, create, getUserForAuthorization } from './user.module';
+import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, IUserForAuthorization } from './user.module';
 import * as Bluebird from 'bluebird';
 const model = require('../../entities');
+const { Op } = require("sequelize");
 
 class User {
 
@@ -28,9 +29,21 @@ class User {
     .then(create);
   }
 
-  getUserForAuthorization(email: string) {
+  getUserForAuthorization(email: string, phone_number: string) {
+    let query = {};
+
+    if (email) {
+      query['email'] = email;
+    }
+
+    if (phone_number) {
+      query['phone_number'] = phone_number
+    }
+    
     return model.User.findOne({
-      where: {email}
+      where: {
+        [Op.and]: [query]
+      }
     })
     .then(getUserForAuthorization);
   }

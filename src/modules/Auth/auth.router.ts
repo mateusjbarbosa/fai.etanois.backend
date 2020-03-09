@@ -21,18 +21,17 @@ export class AuthRouterModule extends BaseRouterModule {
   }
 
   async auth(req: Request, res: Response) {
-    const {email, password} = req.body;
+    const {phone_number, email, password} = req.body;
 
-
-    if (email && password) {
+    if ((email || phone_number) && password) {
       try {
-        const user = await User.getUserForAuthorization(email);
+        const user = await User.getUserForAuthorization(email, phone_number);
         ResponseHandlers.authSuccess(res, password, user);
       } catch(error) {
         ResponseHandlers.authFail(req, res);
       }
     } else {
-      ResponseHandlers.onError(res, 'E-mai and password are required');
+      ResponseHandlers.onError(res, 'E-mail/Phone number and password are required');
     }
   }
 }

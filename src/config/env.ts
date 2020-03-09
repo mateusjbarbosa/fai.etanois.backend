@@ -37,6 +37,17 @@ export class Envorimment {
     },
     serverPort: "80",
     secret: 'S3CR3T'
+  }, {
+    envorimmentName: "production",
+    database: {
+      username: "postgres",
+      password: "postgres",
+      database: "etanois",
+      host: "postgres",
+      dialect: "postgres"
+    },
+    serverPort: "3000",
+    secret: "S3CR3T"
   }];
   
   private envorimment: string
