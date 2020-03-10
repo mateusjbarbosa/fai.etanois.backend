@@ -24,13 +24,6 @@ class Handlers {
     }
   }
 
-  onError(res: Response, menssage: string) {
-    res.status(HttpStatus.PRECONDITION_FAILED).json({ 
-      code: 'ERR-03',
-      menssage: [menssage]
-    });
-  }
-
   onSuccess(res: Response, data: any) {
     res.status(HttpStatus.OK).json({ payload: data });
   }
@@ -58,6 +51,13 @@ class Handlers {
     res.status(HttpStatus.PRECONDITION_FAILED).json({
       code: 'ERR-002',
       menssage: errors
+    });
+  }
+
+  onError(res: Response, menssage: string) {
+    res.status(HttpStatus.PRECONDITION_FAILED).json({ 
+      code: 'ERR-03',
+      menssage: [menssage]
     });
   }
 }
