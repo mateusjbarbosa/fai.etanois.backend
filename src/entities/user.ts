@@ -78,6 +78,24 @@ export default function (sequelize, DataTypes) {
         }
       },
     },
+    search_distance: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        min: {
+          args: 100,
+          msg: 'The distance cannot be less than 100 meters'
+        },
+        max: {
+          args: 10000,
+          msg: 'The distance cannot exceed 10 kilometers'
+        },
+        notNull: {
+          msg: 'Distance for price research  is required'
+        }
+      }
+    },
     payment_mode: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -115,14 +133,13 @@ export default function (sequelize, DataTypes) {
   User.beforeCreate((user) => {
     return hashPassword(user);
   });
-
-  User.beforeUpdate((user) => {
-    return hashPassword(user);
-  });
   
   function hashPassword(user) {
-    const salt = bcrypt.genSaltSync(10);
-    user.set('password', bcrypt.hashSync(user.password, salt));
+    console.log(user)
+    if (user.password) {
+      const salt = bcrypt.genSaltSync(10);
+      user.set('password', bcrypt.hashSync(user.password, salt));
+    }
   }
 
   return User;

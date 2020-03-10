@@ -18,6 +18,7 @@ export interface IUser {
   name: string,
   password: string,
   cep: string,
+  search_distance: number,
   payment_mode: EPaymentMode,
   role?: EUserRoles
 }

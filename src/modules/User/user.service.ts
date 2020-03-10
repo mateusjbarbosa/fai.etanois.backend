@@ -1,5 +1,6 @@
 import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, IUserForAuthorization } from './user.module';
 import * as Bluebird from 'bluebird';
+import * as bcrypt from 'bcrypt';
 const model = require('../../entities');
 const { Op } = require("sequelize");
 
@@ -49,9 +50,48 @@ class User {
   }
 
   update(id: number, user: any){
+    const keys = Object.keys(user);
+    let fields: string[] = [];
+
+    keys.forEach(property => {
+      switch (property)
+      {
+        case 'id':
+          fields.push(property);
+        break;
+
+        case 'phone_number':
+          fields.push(property);
+        break;
+
+        case 'email':
+          fields.push(property);
+        break;
+
+        case 'password':
+          const salt = bcrypt.genSaltSync(10);
+          
+          user.password = bcrypt.hashSync(user.password, salt)
+          fields.push(property);
+        break;
+
+        case 'name':
+            fields.push(property);
+        break;
+
+        case 'search_distance':
+          fields.push(property);
+        break;
+
+        case 'payment_mode':
+          fields.push(property);
+        break;
+      }
+    });
+
     return model.User.update(user, {
       where: {id},
-      fields: ['name', 'email', 'phone_number', 'password', 'payment_mode'],
+      fields: fields,
       hooks: true,
       individualHooks: true
     });
