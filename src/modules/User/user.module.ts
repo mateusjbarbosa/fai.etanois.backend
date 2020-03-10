@@ -29,7 +29,8 @@ export interface IUserDetail {
   email: string,
   name: string,
   cep: string,
-  payment_mode: string
+  payment_mode: string,
+  search_distance: number
 }
 
 export interface IUserForAuthorization {
@@ -42,9 +43,9 @@ export interface IUserForAuthorization {
 
 export function create(user: any): IUserDetail {
   if (user) {
-    const {id, phone_number, email, name, cep, payment_mode} = user;
+    const {id, search_distance, phone_number, email, name, cep, payment_mode} = user;
 
-    return {id, phone_number, email, name, cep, payment_mode};
+    return {id, phone_number, email, name, cep, payment_mode, search_distance};
   }
 
   return null

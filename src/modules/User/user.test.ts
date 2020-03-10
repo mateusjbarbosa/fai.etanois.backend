@@ -16,6 +16,7 @@ export class UserTest {
         password: '1234',
         phone_number: '35984552145',
         cep: '37540000',
+        search_distance: 1000,
         payment_mode: EPaymentMode.BOTH,
         role: EUserRoles.ADMIN
       };
@@ -43,6 +44,7 @@ export class UserTest {
             email: 'novousuario@email.com',
             password: '1234',
             cep: '37548000',
+            search_distance: 200,
             payment_mode: EPaymentMode.CREDIT_CARD,
           };
     
@@ -50,7 +52,7 @@ export class UserTest {
           .then(data => {
             expect(data.dataValues).to.have.all.keys(
               ['email', 'id', 'name', 'password', 'phone_number', 'cep', 'payment_mode', 'role',
-              'updatedAt', 'createdAt']
+              'search_distance', 'updatedAt', 'createdAt']
             );
           })
         });
@@ -81,7 +83,7 @@ export class UserTest {
         it('Deve retornar um usuário de acordo com o id passado', () => {
           return User.getById(defaultUser.id).then(data => {
             expect(data).to.have.all.keys(
-              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number']
+              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number', 'search_distance']
             );
           });
         });
