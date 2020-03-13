@@ -135,7 +135,6 @@ export default function (sequelize, DataTypes) {
   });
   
   function hashPassword(user) {
-    console.log(user)
     if (user.password) {
       const salt = bcrypt.genSaltSync(10);
       user.set('password', bcrypt.hashSync(user.password, salt));

@@ -11,7 +11,7 @@ class Handlers {
 
   authSuccess(res: Response, password: any, data: any) {
     const isMatch = bcrypt.compareSync(password, data.password);
-  
+
     if (isMatch) {
       const payload = {id: data.id, password: data.password, email: data.email,
         phone_number: data.phone_number};

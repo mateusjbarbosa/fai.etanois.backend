@@ -59,7 +59,7 @@ export function getUserForAuthorization(user: any): IUserForAuthorization {
     password: null,
     role: null
   };
-
+  
   if (user) {
     const keys = Object.keys(user._previousDataValues);
 
