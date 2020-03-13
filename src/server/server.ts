@@ -16,7 +16,11 @@ export class Server {
     }
   }
 
-  upServer(): void {
+  public getApplication(): Application {
+    return this.express;
+  }
+
+  public upServer(): void {
     this.server = http.createServer(this.express);
     this.server.listen(Configuration.serverPort);
     this.server.on('listening', () => {

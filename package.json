@@ -6,6 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=development ./node_modules/.bin/ts-node ./bootstrap.ts",
     "unit-test": "NODE_ENV=test mocha ./dist/src/tests/unit/unit.test.js",
+    "integration-test": "NODE_ENV=test mocha ./dist/src/tests/integration/integration.test.js",
     "unit-coverage": "nyc --reporter=html npm run unit-test",
     "production": "NODE_ENV=production ./node_modules/.bin/ts-node ./dist/bootstrap.js"
   },
