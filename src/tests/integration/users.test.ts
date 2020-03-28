@@ -1,6 +1,6 @@
 import { app, request, expect} from './helpers';
 import * as status from 'http-status';
-import { IUser, EPaymentMode } from '../../modules/User/user.module';
+import { IUser, EPaymentMode, EUserRoles } from '../../modules/User/user.module';
 
 export class UserIntegrationTest {
   private endpoint: string = '/api/v1/';
@@ -28,7 +28,8 @@ export class UserIntegrationTest {
         cep: '37548000',
         payment_mode: EPaymentMode.MONEY,
         phone_number: '984552145',
-        search_distance: 1000
+        search_distance: 1000,
+        role: EUserRoles.ADMIN
       };
       let token: string;
     
@@ -41,9 +42,18 @@ export class UserIntegrationTest {
             return model.User.create(userDefault);
           })
           .then(() => {
-            model.User.create(userTest)
-            .then(() => {
-              done();
+            const credential = {
+              phone_number: userDefault.phone_number,
+              password: userDefault.password
+            };
+
+            request(app).post(this.endpoint + 'auth/token').send(credential).end((error, res) => {
+              token = res.body.token;
+              
+              model.User.create(userTest)
+              .then(() => {
+                done();
+              });
             });
           });
         });
@@ -77,17 +87,17 @@ export class UserIntegrationTest {
         })
       })
     
-      describe('GET /api/v1/user/all', () => {
+      describe('GET /api/v1/user', () => {
         it('Deve retornar um array com todos os usuários', done => {
           request(app)
-          .get(this.endpoint + 'user/all')
+          .get(this.endpoint + 'user')
           .set('Content-Type', 'application/json')
           .set('Authorization', `Bearer ${token}`)
           .end((error, res) => {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload).to.be.an('array');
             expect(res.body.payload[0].name).to.be.equal(userDefault.name);
-            expect(res.body.payload[0].email).to.be.equal(userDefault.email);
+            expect(res.body.payload[0].phone_number).to.be.equal(userDefault.phone_number);
             done(error);
           });
         });
@@ -103,7 +113,7 @@ export class UserIntegrationTest {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload.id).to.equal(userDefault.id);
             expect(res.body.payload).to.have.all.keys(
-              ['id', 'name', 'email', 'password']);
+              ['id', 'name', 'email', "cep", 'payment_mode', 'phone_number', 'search_distance']);
             done(error);
           });
         });
@@ -111,17 +121,20 @@ export class UserIntegrationTest {
     
       describe('POST /api/v1/user/new', () => {
         it('Deve criar um novo usuário', done => {
-          const user = {
+          const user: IUser = {
             id: 2,
             name: 'Usuário teste',
             email: 'usuario@email.com',
-            password: 'novouser'
+            password: 'novouser',
+            cep: '37548000',
+            payment_mode: EPaymentMode.MONEY,
+            search_distance: 1000,
+            role: EUserRoles.DRIVER
           };
     
           request(app).post(this.endpoint + 'user/new')
           .send(user)
           .set('Content-Type', 'application/json')
-          .set('Authorization', `Bearer ${token}`)
           .end((error, res) => {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload.id).to.eql(user.id);
@@ -139,7 +152,7 @@ export class UserIntegrationTest {
             email: 'update@email.com'
           };
     
-          request(app).put(this.endpoint + `user/${userTest.id}`)
+          request(app).patch(this.endpoint + `user/${userTest.id}`)
           .send(user)
           .set('Content-Type', 'application/json')
           .set('Authorization', `Bearer ${token}`)
