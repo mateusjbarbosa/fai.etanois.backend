@@ -20,7 +20,7 @@ export interface IUser {
   cep: string,
   search_distance: number,
   payment_mode: EPaymentMode,
-  etacoins: number
+  etacoins?: number
   role?: EUserRoles
 }
 
@@ -32,7 +32,7 @@ export interface IUserDetail {
   cep: string,
   payment_mode: string,
   search_distance: number,
-  etacoins: number
+  etacoins?: number
 }
 
 export interface IUserForAuthorization {
