@@ -37,7 +37,7 @@ export default function (sequelize, DataTypes) {
         },
         len: {
           args: [10, 100],
-          msg: 'E-mail is too short'
+          msg: 'E-mail is too short or too large'
         },
         isEmail:{
           args: true,
@@ -63,7 +63,7 @@ export default function (sequelize, DataTypes) {
         },
         len: {
           args: [6, 50],
-          msg: 'Name is too short'
+          msg: 'Name is too short or too large'
         },
         notNull: {
           msg: 'Username is required'
