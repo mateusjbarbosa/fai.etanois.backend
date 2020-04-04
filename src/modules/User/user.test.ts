@@ -65,7 +65,7 @@ export class UserTest {
             email: 'atualizado@email.com'
           }
     
-          return User.update(defaultUser.id, userUpdate).then(data => {
+          return User.update(defaultUser.id, userUpdate, EUserRoles.ADMIN).then(data => {
             expect(data[0]).to.be.equal(1);
           })
         });
