@@ -113,7 +113,8 @@ export class UserIntegrationTest {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload.id).to.equal(userDefault.id);
             expect(res.body.payload).to.have.all.keys(
-              ['id', 'name', 'email', "cep", 'payment_mode', 'phone_number', 'search_distance']);
+              ['id', 'name', 'email', "cep", 'payment_mode', 'phone_number', 'search_distance',
+                'etacoins']);
             done(error);
           });
         });
@@ -158,7 +159,8 @@ export class UserIntegrationTest {
           .set('Authorization', `Bearer ${token}`)
           .end((error, res) => {
             expect(res.status).to.equal(status.OK);
-            expect(res.body.payload[0]).to.equal(1);
+            expect(res.body.payload.name).to.eql(user.name);
+            expect(res.body.payload.email).to.eql(user.email);
             done(error);
           });
         });

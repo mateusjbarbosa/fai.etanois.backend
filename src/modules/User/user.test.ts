@@ -52,7 +52,7 @@ export class UserTest {
           .then(data => {
             expect(data.dataValues).to.have.all.keys(
               ['email', 'id', 'name', 'password', 'phone_number', 'cep', 'payment_mode', 'role',
-              'search_distance', 'updatedAt', 'createdAt']
+              'search_distance', 'etacoins', 'updatedAt', 'createdAt']
             );
           })
         });
@@ -66,7 +66,10 @@ export class UserTest {
           }
     
           return User.update(defaultUser.id, userUpdate, EUserRoles.ADMIN).then(data => {
-            expect(data[0]).to.be.equal(1);
+            expect(data).to.have.all.keys(
+              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number', 'search_distance',
+                'etacoins']
+            );
           })
         });
       });
@@ -83,7 +86,8 @@ export class UserTest {
         it('Deve retornar um usuário de acordo com o id passado', () => {
           return User.getById(defaultUser.id).then(data => {
             expect(data).to.have.all.keys(
-              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number', 'search_distance']
+              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number', 'search_distance',
+                'etacoins']
             );
           });
         });
