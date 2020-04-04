@@ -7,6 +7,25 @@ export default function (sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
+    etacoins: {
+      type: DataTypes.INTEGER,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Etacoins cannot be empy'
+        },
+        isInt: {
+          args: true,
+          msg: 'Etacoins must be integer'
+        },
+        isGreaterThanZero(value) {
+          if (value < 0) {
+            throw new Error('Etacoins must be greater than zero');
+          }
+        }
+      },
+      defaultValue: 0
+    },
     email: {
       type: DataTypes.STRING(100),
       allowNull: true,

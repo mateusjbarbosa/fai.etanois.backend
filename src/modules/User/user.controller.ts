@@ -52,7 +52,7 @@ class UserController {
     {
       if (this.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
       {
-        User.update(userId, props)
+        User.update(userId, props, req.user['role'])
         .then(_.partial(Handlers.onSuccess, res))
         .catch(_.partial(Handlers.dbErrorHandler, res))
         .catch(_.partial(Handlers.onError, res, 'Error updating user'));

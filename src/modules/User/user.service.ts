@@ -1,4 +1,4 @@
-import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, IUserForAuthorization } from './user.module';
+import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles } from './user.module';
 import * as Bluebird from 'bluebird';
 import * as bcrypt from 'bcrypt';
 const model = require('../../entities');
@@ -10,6 +10,7 @@ class User {
 
   create(user: any): Promise<any>{
     if (user.phone_number || user.email) {
+      user['etacoins'] = 0;
       return model.User.create(user);
     } else {
       throw new Error('Phone number or email is required').message;
@@ -49,7 +50,7 @@ class User {
     .then(getUserForAuthorization);
   }
 
-  update(id: number, user: any){
+  update(id: number, user: any, role: EUserRoles){
     const keys = Object.keys(user);
     let fields: string[] = [];
 
@@ -86,6 +87,12 @@ class User {
         case 'payment_mode':
           fields.push(property);
         break;
+
+        case 'etacoins':
+          if (role == EUserRoles.ADMIN) {
+            fields.push(property);
+          }
+        break;
       }
     });
 
@@ -94,7 +101,8 @@ class User {
       fields: fields,
       hooks: true,
       individualHooks: true
-    });
+    })
+    .then(create);
   }
 
   delete(id: number){
