@@ -138,9 +138,6 @@ export class UserIntegrationTest {
           .set('Content-Type', 'application/json')
           .end((error, res) => {
             expect(res.status).to.equal(status.OK);
-            expect(res.body.payload.id).to.eql(user.id);
-            expect(res.body.payload.name).to.eql(user.name);
-            expect(res.body.payload.email).to.eql(user.email);
             done(error);
           });
         });
