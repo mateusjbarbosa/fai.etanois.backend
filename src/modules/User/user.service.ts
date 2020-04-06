@@ -11,7 +11,15 @@ class User {
   create(user: any): Promise<any>{
     if (user.phone_number || user.email) {
       user['etacoins'] = 0;
-      return model.User.create(user);
+      return model.User.create(user)
+      .then((userCreated) => {
+        if (user.hasOwnProperty('user_preference_fuel')) {
+          return user.user_preference_fuel.reduce((prev, object) => {
+            object['user_id'] = userCreated.dataValues.id;
+            model.UserPreferenceFuel.create(object);
+          }, Promise.resolve());
+        }
+      });
     } else {
       throw new Error('Phone number or email is required').message;
     }

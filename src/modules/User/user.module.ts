@@ -21,7 +21,8 @@ export interface IUser {
   search_distance: number,
   payment_mode: EPaymentMode,
   etacoins?: number
-  role?: EUserRoles
+  role?: EUserRoles,
+  user_preference_fuel?: IUserPreferenceFuel[]
 }
 
 export interface IUserDetail {
@@ -33,6 +34,11 @@ export interface IUserDetail {
   payment_mode: string,
   search_distance: number,
   etacoins?: number
+  user_preference_fuel?: IUserPreferenceFuel[]
+}
+
+export interface IUserPreferenceFuel {
+  fuel_name: string
 }
 
 export interface IUserForAuthorization {
