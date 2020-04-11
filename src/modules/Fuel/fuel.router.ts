@@ -19,7 +19,7 @@ export class FuelRouterModule extends BaseRouterModule {
         {
           endpoint: this.baseEndpoint,
           callback: FuelController.readAll,
-          isProtected: true
+          isProtected: false
         }
       ],
       patch: [

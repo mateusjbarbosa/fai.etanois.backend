@@ -20,11 +20,9 @@ class FuelController {
   }
 
   public readAll = (req: Request, res: Response) => {
-    if (Authenticate.verifyUserType(req, res, req.user['role'], 0, req.user['id'])) {
-      Fuel.getAll()
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.onError, res, 'Error fetching all fuels'));
-    }
+    Fuel.getAll()
+    .then(_.partial(Handlers.onSuccess, res))
+    .catch(_.partial(Handlers.onError, res, 'Error fetching all fuels'));
   }
 
   public update = (req: Request, res: Response) => {
