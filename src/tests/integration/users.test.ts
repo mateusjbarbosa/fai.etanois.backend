@@ -114,7 +114,7 @@ export class UserIntegrationTest {
             expect(res.body.payload.id).to.equal(userDefault.id);
             expect(res.body.payload).to.have.all.keys(
               ['id', 'name', 'email', "cep", 'payment_mode', 'phone_number', 'search_distance',
-                'etacoins']);
+                'etacoins', 'UserPreferenceFuels']);
             done(error);
           });
         });
