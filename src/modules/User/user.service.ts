@@ -27,14 +27,18 @@ class User {
   
   getAll(): Bluebird<IUserDetail[]>{
     return model.User.findAll({
-      order: ['name']
+      order: ['name'],
+      include: [{
+        model: model.UserPreferenceFuel}]
     })
     .then(createUsers);
   }
   
   getById(id: number): Bluebird<IUserDetail>{
     return model.User.findOne({
-      where: {id}
+      where: {id},
+      include: [{
+        model: model.UserPreferenceFuel}]
     })
     .then(create);
   }

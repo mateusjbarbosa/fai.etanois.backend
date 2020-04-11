@@ -22,7 +22,7 @@ export interface IUser {
   payment_mode: EPaymentMode,
   etacoins?: number
   role?: EUserRoles,
-  user_preference_fuel?: IUserPreferenceFuel[]
+  UserPreferenceFuels?: IUserPreferenceFuel[]
 }
 
 export interface IUserDetail {
@@ -34,7 +34,7 @@ export interface IUserDetail {
   payment_mode: string,
   search_distance: number,
   etacoins?: number
-  user_preference_fuel?: IUserPreferenceFuel[]
+  UserPreferenceFuels?: IUserPreferenceFuel[]
 }
 
 export interface IUserPreferenceFuel {
@@ -64,9 +64,17 @@ export function create(user: any): IUserDetail {
   
   if (userObject) {
     const {id, search_distance, phone_number, email, name, cep, payment_mode,
-      etacoins} = userObject;
+      etacoins, UserPreferenceFuels} = userObject;
+      
+      UserPreferenceFuels.forEach(item => {
+        delete item.dataValues.id
+        delete item.dataValues.user_id
+        delete item.dataValues.createdAt
+        delete item.dataValues.updatedAt
+      })
 
-    return {id, phone_number, email, name, cep, payment_mode, search_distance, etacoins};
+    return {id, phone_number, email, name, cep, payment_mode, search_distance, etacoins,
+      UserPreferenceFuels};
   }
 
   return null
