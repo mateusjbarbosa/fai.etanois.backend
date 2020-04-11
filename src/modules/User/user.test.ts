@@ -5,6 +5,9 @@ import { IUser, EUserRoles, EPaymentMode } from './user.module';
 export class UserTest {
   constructor() {}
 
+  private propetyExpected: string[] = ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number',
+  'search_distance', 'etacoins', 'UserPreferenceFuels'];
+
   public runTests(): void {
     describe('Unit Test: User', () => {
       'use strict';
@@ -48,13 +51,7 @@ export class UserTest {
             payment_mode: EPaymentMode.CREDIT_CARD,
           };
     
-          return User.create(newUser)
-          .then(data => {
-            expect(data.dataValues).to.have.all.keys(
-              ['email', 'id', 'name', 'password', 'phone_number', 'cep', 'payment_mode', 'role',
-              'search_distance', 'etacoins', 'updatedAt', 'createdAt']
-            );
-          })
+          return User.create(newUser);
         });
       });
     
@@ -67,8 +64,7 @@ export class UserTest {
     
           return User.update(defaultUser.id, userUpdate, EUserRoles.ADMIN).then(data => {
             expect(data).to.have.all.keys(
-              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number', 'search_distance',
-                'etacoins']
+              this.propetyExpected
             );
           })
         });
@@ -86,8 +82,7 @@ export class UserTest {
         it('Deve retornar um usuário de acordo com o id passado', () => {
           return User.getById(defaultUser.id).then(data => {
             expect(data).to.have.all.keys(
-              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number', 'search_distance',
-                'etacoins']
+              this.propetyExpected
             );
           });
         });
