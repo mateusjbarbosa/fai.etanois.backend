@@ -66,13 +66,15 @@ export function create(user: any): IUserDetail {
     const {id, search_distance, phone_number, email, name, cep, payment_mode,
       etacoins, UserPreferenceFuels} = userObject;
       
-      UserPreferenceFuels.forEach(item => {
-        delete item.dataValues.id
-        delete item.dataValues.user_id
-        delete item.dataValues.createdAt
-        delete item.dataValues.updatedAt
-      })
-
+      if (UserPreferenceFuels) {
+        UserPreferenceFuels.forEach(item => {
+          delete item.dataValues.id
+          delete item.dataValues.user_id
+          delete item.dataValues.createdAt
+          delete item.dataValues.updatedAt
+        })
+      }
+      
     return {id, phone_number, email, name, cep, payment_mode, search_distance, etacoins,
       UserPreferenceFuels};
   }
