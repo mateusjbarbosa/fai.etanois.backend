@@ -26,6 +26,9 @@ npm start
 - 5432: postgresql;
 - 8080: pgadmin;
 - 80: api;
+- 6379: redis;
+
+## Testes automatizados
 
 Para a execução dos testes unitários:
 
