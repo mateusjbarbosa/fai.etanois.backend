@@ -6,6 +6,7 @@ node_js:
   - 12.13.1
 services:
   - postgresql
+  - redis
 env:
   global:
   - NODE_ENV: test
