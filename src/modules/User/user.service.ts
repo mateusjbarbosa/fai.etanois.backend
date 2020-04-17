@@ -1,5 +1,6 @@
 import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
-  generateRandomToken } from './user.module';
+  generateRandomToken} from './user.module';
+import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
 import * as bcrypt from 'bcrypt';
 const model = require('../../entities');
@@ -124,6 +125,16 @@ class User {
         [Op.and]: [query]
       }
     }).then(generateRandomToken);
+  }
+
+  recoveryPassword(token: string) {
+    return Redis.verifyExistenceToken(token).then(id => {
+        if (id) {
+          return model.User.findOne({
+            where: {id}
+          }).then(getUserForAuthorization);
+        }
+      });
   }
 
   private generateQueryByCredential(email: string, phone_number: string): object {

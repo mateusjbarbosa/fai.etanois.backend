@@ -13,15 +13,19 @@ class Handlers {
     const isMatch = bcrypt.compareSync(password, data.password);
 
     if (isMatch) {
-      const payload = {id: data.id, password: data.password, email: data.email,
-        phone_number: data.phone_number};
-
-      res.status(HttpStatus.OK).json({
-        token: jwt.encode(payload, Configuration.secret)
-      });
+      this.generateToken(res, data)
     } else {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
+  }
+
+  generateToken(res: Response, data: any) {
+    const payload = {id: data.id, password: data.password, email: data.email,
+      phone_number: data.phone_number};
+
+    res.status(HttpStatus.OK).json({
+      token: jwt.encode(payload, Configuration.secret)
+    });
   }
 
   onSuccess(res: Response, data: any) {

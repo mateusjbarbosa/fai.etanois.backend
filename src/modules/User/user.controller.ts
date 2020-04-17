@@ -85,6 +85,17 @@ class UserController {
       ResponseHandlers.onError(res, 'E-mail/Phone number and password are required');
     }
   }
+
+  public recovryPassword = (req: Request, res: Response) => {
+    const token = req.params.token;
+
+    User.recoveryPassword(token)
+    .then(data => {
+      Handlers.generateToken(res, data);
+    })
+    .catch(_.partial(Handlers.onError, res, 'Invalid token'));
+    
+  }
 }
 
 export default new UserController();
