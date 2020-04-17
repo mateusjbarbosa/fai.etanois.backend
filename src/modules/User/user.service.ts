@@ -1,4 +1,5 @@
-import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles } from './user.module';
+import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
+  generateRandomToken } from './user.module';
 import * as Bluebird from 'bluebird';
 import * as bcrypt from 'bcrypt';
 const model = require('../../entities');
@@ -44,15 +45,7 @@ class User {
   }
 
   getUserForAuthorization(email: string, phone_number: string) {
-    let query = {};
-
-    if (email) {
-      query['email'] = email;
-    }
-
-    if (phone_number) {
-      query['phone_number'] = phone_number
-    }
+    const query = this.generateQueryByCredential(email, phone_number);
     
     return model.User.findOne({
       where: {
@@ -121,6 +114,30 @@ class User {
     return model.User.destroy({
       where: {id}
     });
+  }
+
+  forgotPassword(email: string, phone_number: string) {
+    const query = this.generateQueryByCredential(email, phone_number);
+
+    return model.User.findOne({
+      where: {
+        [Op.and]: [query]
+      }
+    }).then(generateRandomToken);
+  }
+
+  private generateQueryByCredential(email: string, phone_number: string): object {
+    let query = {};
+
+    if (email) {
+      query['email'] = email;
+    }
+
+    if (phone_number) {
+      query['phone_number'] = phone_number
+    }
+
+    return query
   }
 }
 

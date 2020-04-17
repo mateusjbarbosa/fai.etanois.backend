@@ -1,6 +1,5 @@
 import * as redis from 'redis'
 import Configuration from '../../config/config'
-import { token } from 'morgan'
 
 class Redis {
   private configRedis: redis.ClientOpts
@@ -19,7 +18,7 @@ class Redis {
     })
   }
 
-  public createRecoverPassword(token: string, userId: string) {
+  public createRecoverPassword(token: string, userId: string): void {
     this.client.set(token, userId, () => {})
     this.client.expire(token, (60), () => {})
   }

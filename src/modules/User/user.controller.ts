@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import User from './user.service';
 import Handlers from '../../core/handlers/response-handlers';
 import { EUserRoles } from './user.module';
+import ResponseHandlers from '../../core/handlers/response-handlers';
 import Authenticate from '../Auth/authenticate.service'
 
 class UserController {
@@ -70,6 +71,18 @@ class UserController {
       User.delete(userId)
       .then(_.partial(Handlers.onSuccess, res))
       .catch(_.partial(Handlers.onError, res, 'Error deleting user'));
+    }
+  }
+
+  public forgotPassword = (req: Request, res: Response) => {
+    const {phone_number, email} = req.body;
+
+    if (phone_number || email) {
+      User.forgotPassword(email, phone_number)
+      .then(_.partial(Handlers.onSuccess, res))
+      .catch(_.partial(Handlers.onError, res, 'User not found'));
+    } else {
+      ResponseHandlers.onError(res, 'E-mail/Phone number and password are required');
     }
   }
 }

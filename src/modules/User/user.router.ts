@@ -13,6 +13,11 @@ export class UserRouterModule extends BaseRouterModule {
           endpoint: this.baseEndpoint + 'new',
           callback: UserController.create,
           isProtected: false
+        },
+        {
+          endpoint: this.baseEndpoint + 'forgot_password',
+          callback: UserController.forgotPassword,
+          isProtected: false
         }
       ],
       get: [
@@ -31,8 +36,7 @@ export class UserRouterModule extends BaseRouterModule {
         {
           endpoint: this.baseEndpoint + ':id',
           callback: UserController.update,
-          isProtected: true,
-          
+          isProtected: true
         }
       ],
       delete: [

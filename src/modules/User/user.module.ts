@@ -1,3 +1,6 @@
+import * as crypto from 'crypto'
+import Redis from '../../core/redis/redis';
+
 export enum EUserRoles {
   ADMIN = 'admin',
   DRIVER = 'driver',
@@ -127,4 +130,21 @@ export function getUserForAuthorization(user: any): IUserForAuthorization {
 
 export function createUsers(data: any[]): IUserDetail[] {
   return data.map(create);
+}
+
+export async function generateRandomToken(user: any): Promise<any> {
+  if (user) {
+    const { id } = user;
+
+    return new Promise(resolve => {
+      crypto.randomBytes(20, (err, buffer) => {
+        const token = buffer.toString('hex')
+        
+        Redis.createRecoverPassword(token, id)
+        resolve({token: token})
+      });
+    });
+  } else {
+    throw new Error('User not found').message;
+  }
 }
