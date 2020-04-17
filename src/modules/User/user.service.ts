@@ -131,12 +131,12 @@ class User {
     const redis = new Redis();
 
     return redis.verifyExistenceToken(token).then(id => {
-        if (id) {
-          return model.User.findOne({
-            where: {id}
-          }).then(getUserForAuthorization);
-        }
-      });
+      if (id) {
+        return model.User.findOne({
+          where: {id}
+        }).then(getUserForAuthorization);
+      }
+    });
   }
 
   private generateQueryByCredential(email: string, phone_number: string): object {

@@ -80,7 +80,7 @@ class UserController {
     if (phone_number || email) {
       User.forgotPassword(email, phone_number)
       .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.onError, res, 'User not found'));
+      .catch(_.partial(Handlers.onError, res, 'It was not possible to send the email'));
     } else {
       ResponseHandlers.onError(res, 'E-mail/Phone number and password are required');
     }
@@ -94,7 +94,6 @@ class UserController {
       Handlers.generateToken(res, data);
     })
     .catch(_.partial(Handlers.onError, res, 'Invalid token'));
-    
   }
 }
 
