@@ -128,7 +128,9 @@ class User {
   }
 
   recoveryPassword(token: string) {
-    return Redis.verifyExistenceToken(token).then(id => {
+    const redis = new Redis();
+
+    return redis.verifyExistenceToken(token).then(id => {
         if (id) {
           return model.User.findOne({
             where: {id}

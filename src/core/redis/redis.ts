@@ -34,4 +34,4 @@ class Redis {
   }
 }
 
-export default new Redis()
+export default Redis

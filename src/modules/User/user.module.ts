@@ -139,8 +139,9 @@ export async function generateRandomToken(user: any): Promise<any> {
     return new Promise(resolve => {
       crypto.randomBytes(20, (err, buffer) => {
         const token = buffer.toString('hex')
-        
-        Redis.createRecoverPassword(token, id)
+        const redis = new Redis();
+
+        redis.createRecoverPassword(token, id)
         resolve({token: token})
       });
     });
