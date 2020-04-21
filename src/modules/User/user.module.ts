@@ -22,7 +22,8 @@ export interface IUser {
   name: string,
   password: string,
   cep: string,
-  search_distance: number,
+  search_distance_with_route: number,
+  search_distance_without_route: number,
   payment_mode: EPaymentMode,
   etacoins?: number
   role?: EUserRoles,
@@ -36,7 +37,8 @@ export interface IUserDetail {
   name: string,
   cep: string,
   payment_mode: string,
-  search_distance: number,
+  search_distance_with_route: number,
+  search_distance_without_route: number,
   etacoins?: number
   UserPreferenceFuels?: IUserPreferenceFuel[]
 }
@@ -67,8 +69,8 @@ export function create(user: any): IUserDetail {
   }
   
   if (userObject) {
-    const {id, search_distance, username, email, name, cep, payment_mode,
-      etacoins, UserPreferenceFuels} = userObject;
+    let {id, search_distance_with_route, search_distance_without_route, username, email, name,
+      cep, payment_mode, etacoins, UserPreferenceFuels} = userObject;
       
       if (UserPreferenceFuels) {
         UserPreferenceFuels.forEach(item => {
@@ -78,9 +80,12 @@ export function create(user: any): IUserDetail {
           delete item.dataValues.updatedAt
         })
       }
+
+      search_distance_with_route = parseInt(search_distance_with_route)
+      search_distance_without_route = parseInt(search_distance_without_route)
       
-    return {id, username, email, name, cep, payment_mode, search_distance, etacoins,
-      UserPreferenceFuels};
+    return {id, username, email, name, cep, payment_mode, search_distance_with_route, etacoins,
+      search_distance_without_route, UserPreferenceFuels};
   }
 
   return null

@@ -83,7 +83,11 @@ class User {
             fields.push(property);
         break;
 
-        case 'search_distance':
+        case 'search_distance_with_route':
+          fields.push(property);
+        break;
+
+        case 'search_distance_without_route':
           fields.push(property);
         break;
 

@@ -29,7 +29,10 @@ export default function (sequelize, DataTypes) {
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      unique: true,
+      unique: {
+        args: true,
+        msg: 'E-mail is already in use',
+      },
       validate: {
         notEmpty: {
           args: true,
@@ -48,7 +51,10 @@ export default function (sequelize, DataTypes) {
     username: {
       type: DataTypes.STRING(12),
       allowNull: false,
-      unique: true,
+      unique: {
+        args: true,
+        msg: 'Username is already in use',
+      },
       validate: {
         notEmpty: {
           args: true,
@@ -107,21 +113,53 @@ export default function (sequelize, DataTypes) {
         }
       },
     },
-    search_distance: {
+    search_distance_with_route: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
-        notEmpty: true,
+        notEmpty: {
+          args: true,
+          msg: 'The search distance with route can\'t be empty'
+        },
         min: {
           args: 100,
-          msg: 'The distance can\'t be less than 100 meters'
+          msg: 'The search distance with route can\'t be less than 100 meters'
         },
         max: {
           args: 10000,
-          msg: 'The distance can\'t exceed 10 kilometers'
+          msg: 'The search distance with route can\'t exceed 10 kilometers'
         },
         notNull: {
-          msg: 'Distance for price research  is required'
+          msg: 'Search distance with route  is required'
+        },
+        isNumeric: {
+          args: true,
+          msg: 'Search distance with route must be numeric'
+        }
+      }
+    },
+    search_distance_without_route: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'The search distance without route can\'t be empty'
+        },
+        min: {
+          args: 100,
+          msg: 'The search distance without route can\'t be less than 100 meters'
+        },
+        max: {
+          args: 10000,
+          msg: 'The search distance without route can\'t exceed 10 kilometers'
+        },
+        notNull: {
+          msg: 'Search distance without route  is required'
+        },
+        isNumeric: {
+          args: true,
+          msg: 'Search distance without route must be numeric'
         }
       }
     },
