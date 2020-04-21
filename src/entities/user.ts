@@ -45,6 +45,9 @@ export default function (sequelize, DataTypes) {
         isEmail:{
           args: true,
           msg: 'E-mail is invalid'
+        },
+        notNull: {
+          msg: 'E-mail is required'
         }
       }
     },

@@ -11,26 +11,22 @@ class User {
   constructor() {}
 
   create(user: any): Promise<any>{
-    if (user.username && user.email) {
-      user['etacoins'] = 0;
+    user['etacoins'] = 0;
 
-      return new Promise((resolve, reject) => {
-        model.User.create(user)
-        .then((userCreated) => {
-          if (user.hasOwnProperty('user_preference_fuel')) {
-            return user.user_preference_fuel.reduce((prev, object) => {
-              object['user_id'] = userCreated.dataValues.id;
-              model.UserPreferenceFuel.create(object);
-            }, resolve({msg: 'Created user'}));
-          } else {
-            resolve({msg: 'Created user'})
-          }
-        })
-        .catch(err => {reject(err)});
-      });
-    } else {
-      throw new Error('Username and email are required').message;
-    }
+    return new Promise((resolve, reject) => {
+      model.User.create(user)
+      .then((userCreated) => {
+        if (user.hasOwnProperty('user_preference_fuel')) {
+          return user.user_preference_fuel.reduce((prev, object) => {
+            object['user_id'] = userCreated.dataValues.id;
+            model.UserPreferenceFuel.create(object);
+          }, resolve({msg: 'Created user'}));
+        } else {
+          resolve({msg: 'Created user'})
+        }
+      })
+      .catch(err => {reject(err)});
+    });
   }
   
   getAll(): Bluebird<IUserDetail[]>{
