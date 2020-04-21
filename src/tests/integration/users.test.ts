@@ -18,16 +18,18 @@ export class UserIntegrationTest {
         email: 'teste@email.com',
         password: 'teste',
         cep: '37540000',
+        username: 'userTest',
         payment_mode: EPaymentMode.CREDIT_CARD,
         search_distance: 100
       };
       const userDefault: IUser = {
         id: 1,
         name: 'Default User',
+        email: 'userdafault@email.com',
         password: 'default',
         cep: '37548000',
         payment_mode: EPaymentMode.MONEY,
-        phone_number: '984552145',
+        username: 'userDafault',
         search_distance: 1000,
         role: EUserRoles.ADMIN
       };
@@ -43,7 +45,7 @@ export class UserIntegrationTest {
           })
           .then(() => {
             const credential = {
-              phone_number: userDefault.phone_number,
+              username: userDefault.username,
               password: userDefault.password
             };
 
@@ -62,7 +64,7 @@ export class UserIntegrationTest {
       describe('POST auth/token', () => {
         it('Com o email sendo fornecido, deve receber um JWT', done => {
           const credential = {
-            phone_number: userDefault.phone_number,
+            username: userDefault.username,
             password: userDefault.password
           };
     
@@ -97,7 +99,7 @@ export class UserIntegrationTest {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload).to.be.an('array');
             expect(res.body.payload[0].name).to.be.equal(userDefault.name);
-            expect(res.body.payload[0].phone_number).to.be.equal(userDefault.phone_number);
+            expect(res.body.payload[0].username).to.be.equal(userDefault.username);
             done(error);
           });
         });
@@ -113,7 +115,7 @@ export class UserIntegrationTest {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload.id).to.equal(userDefault.id);
             expect(res.body.payload).to.have.all.keys(
-              ['id', 'name', 'email', "cep", 'payment_mode', 'phone_number', 'search_distance',
+              ['id', 'name', 'email', "cep", 'payment_mode', 'username', 'search_distance',
                 'etacoins', 'UserPreferenceFuels']);
             done(error);
           });
@@ -127,6 +129,7 @@ export class UserIntegrationTest {
             name: 'Usuário teste',
             email: 'usuario@email.com',
             password: 'novouser',
+            username: 'newUser',
             cep: '37548000',
             payment_mode: EPaymentMode.MONEY,
             search_distance: 1000,

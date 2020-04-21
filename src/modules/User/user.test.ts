@@ -5,7 +5,7 @@ import { IUser, EUserRoles, EPaymentMode } from './user.module';
 export class UserTest {
   constructor() {}
 
-  private propetyExpected: string[] = ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number',
+  private propetyExpected: string[] = ['email', 'id', 'name', 'cep', 'payment_mode', 'username',
   'search_distance', 'etacoins', 'UserPreferenceFuels'];
 
   public runTests(): void {
@@ -17,7 +17,7 @@ export class UserTest {
         name: 'Default User',
         email: 'defaultuser@email.com',
         password: '1234',
-        phone_number: '35984552145',
+        username: 'userDefault',
         cep: '37540000',
         search_distance: 1000,
         payment_mode: EPaymentMode.BOTH,
@@ -45,6 +45,7 @@ export class UserTest {
             id: 2,
             name: 'Novo Usuário',
             email: 'novousuario@email.com',
+            username: 'newUser',
             password: '1234',
             cep: '37548000',
             search_distance: 200,
