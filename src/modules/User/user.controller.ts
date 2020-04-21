@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import User from './user.service';
 import Handlers from '../../core/handlers/response-handlers';
 import { EUserRoles } from './user.module';
-import ResponseHandlers from '../../core/handlers/response-handlers';
 import Authenticate from '../Auth/authenticate.service'
 
 class UserController {
@@ -80,9 +79,9 @@ class UserController {
     if (username || email) {
       User.forgotPassword(email, username)
       .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.onError, res, 'It was not possible to send the email'));
+      .catch(err => { Handlers.onError(res, err) });
     } else {
-      ResponseHandlers.onError(res, 'E-mail/Phone number and password are required');
+      Handlers.onError(res, 'E-mail/Phone number and password are required');
     }
   }
 

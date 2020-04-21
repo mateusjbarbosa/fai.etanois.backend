@@ -36,7 +36,7 @@ class Handlers {
     console.log(`API error handler was executed: ${err}`);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       code: 'ERR-001',
-      message: ['Internal error']
+      msg: ['Internal error']
     });
   }
 
@@ -53,14 +53,14 @@ class Handlers {
 
     res.status(HttpStatus.PRECONDITION_FAILED).json({
       code: 'ERR-002',
-      menssage: errors
+      msg: errors
     });
   }
 
   onError(res: Response, menssage: string) {
     res.status(HttpStatus.PRECONDITION_FAILED).json({ 
       code: 'ERR-03',
-      menssage: [menssage]
+      msg: [menssage]
     });
   }
 }

@@ -126,11 +126,16 @@ class User {
   forgotPassword(email: string, username: string) {
     const query = this.generateQueryByCredential(email, username);
 
-    return model.User.findOne({
-      where: {
-        [Op.and]: [query]
-      }
-    }).then(generateRandomToken);
+    return new Promise((resolve, reject) => {
+      model.User.findOne({
+        where: {
+          [Op.and]: [query]
+        }
+      })
+      .then(generateRandomToken)
+      .then(msg => {resolve(msg)})
+      .catch(err => {reject(err)});
+    });
   }
 
   recoveryPassword(token: string) {
