@@ -75,10 +75,10 @@ class UserController {
   }
 
   public forgotPassword = (req: Request, res: Response) => {
-    const {phone_number, email} = req.body;
+    const {username, email} = req.body;
 
-    if (phone_number || email) {
-      User.forgotPassword(email, phone_number)
+    if (username || email) {
+      User.forgotPassword(email, username)
       .then(_.partial(Handlers.onSuccess, res))
       .catch(_.partial(Handlers.onError, res, 'It was not possible to send the email'));
     } else {

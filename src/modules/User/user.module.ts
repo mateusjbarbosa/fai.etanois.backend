@@ -17,7 +17,7 @@ export enum EPaymentMode {
 
 export interface IUser {
   readonly id: number,
-  phone_number?: string,
+  username: string,
   email?: string,
   name: string,
   password: string,
@@ -31,7 +31,7 @@ export interface IUser {
 
 export interface IUserDetail {
   readonly id: number,
-  phone_number: string,
+  username: string,
   email: string,
   name: string,
   cep: string,
@@ -47,7 +47,7 @@ export interface IUserPreferenceFuel {
 
 export interface IUserForAuthorization {
   id: number,
-  phone_number?: string,
+  username: string,
   email?: string,
   password: string,
   role: EUserRoles
@@ -67,7 +67,7 @@ export function create(user: any): IUserDetail {
   }
   
   if (userObject) {
-    const {id, search_distance, phone_number, email, name, cep, payment_mode,
+    const {id, search_distance, username, email, name, cep, payment_mode,
       etacoins, UserPreferenceFuels} = userObject;
       
       if (UserPreferenceFuels) {
@@ -79,7 +79,7 @@ export function create(user: any): IUserDetail {
         })
       }
       
-    return {id, phone_number, email, name, cep, payment_mode, search_distance, etacoins,
+    return {id, username, email, name, cep, payment_mode, search_distance, etacoins,
       UserPreferenceFuels};
   }
 
@@ -90,7 +90,7 @@ export function getUserForAuthorization(user: any): IUserForAuthorization {
   let userAuthoriation: IUserForAuthorization = {
     id: null,
     email: null,
-    phone_number: null,
+    username: null,
     password: null,
     role: null
   };
@@ -105,8 +105,8 @@ export function getUserForAuthorization(user: any): IUserForAuthorization {
           userAuthoriation.id = user[property];
         break;
 
-        case 'phone_number':
-          userAuthoriation.phone_number = user[property];
+        case 'username':
+          userAuthoriation.username = user[property];
         break;
 
         case 'email':

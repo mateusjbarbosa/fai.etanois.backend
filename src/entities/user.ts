@@ -28,12 +28,12 @@ export default function (sequelize, DataTypes) {
     },
     email: {
       type: DataTypes.STRING(100),
-      allowNull: true,
+      allowNull: false,
       unique: true,
       validate: {
         notEmpty: {
           args: true,
-          msg: 'E-mail cannot be empty'
+          msg: 'E-mail can\'t be empty'
         },
         len: {
           args: [10, 100],
@@ -45,12 +45,22 @@ export default function (sequelize, DataTypes) {
         }
       }
     },
-    phone_number: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    username: {
+      type: DataTypes.STRING(12),
+      allowNull: false,
       unique: true,
       validate: {
-        notEmpty: true,
+        notEmpty: {
+          args: true,
+          msg: 'Username can\'t be empty'
+        },
+        len: {
+          args: [3, 12],
+          msg: 'Username is too short or too large'
+        },
+        notNull: {
+          msg: 'Username is required'
+        }
       }
     },
     name: {
@@ -59,14 +69,14 @@ export default function (sequelize, DataTypes) {
       validate: {
         notEmpty: {
           args: true,
-          msg: 'Name cannot be empy'
+          msg: 'Name can\'t be empy'
         },
         len: {
           args: [6, 50],
           msg: 'Name is too short or too large'
         },
         notNull: {
-          msg: 'Username is required'
+          msg: 'Name is required'
         }
       }
     },
@@ -76,7 +86,7 @@ export default function (sequelize, DataTypes) {
       validate: {
         notEmpty: {
           args: true,
-          msg: 'Password cannot be empty'
+          msg: 'Password can\'t be empty'
         },
         notNull: {
           msg: 'Password is required'
@@ -104,11 +114,11 @@ export default function (sequelize, DataTypes) {
         notEmpty: true,
         min: {
           args: 100,
-          msg: 'The distance cannot be less than 100 meters'
+          msg: 'The distance can\'t be less than 100 meters'
         },
         max: {
           args: 10000,
-          msg: 'The distance cannot exceed 10 kilometers'
+          msg: 'The distance can\'t exceed 10 kilometers'
         },
         notNull: {
           msg: 'Distance for price research  is required'
@@ -121,7 +131,7 @@ export default function (sequelize, DataTypes) {
       validate: {
         notEmpty: {
           arg: true,
-          msg: 'Payment format cannot be empty'
+          msg: 'Payment format can\'t be empty'
         },
         isIn: 
         {
@@ -138,7 +148,7 @@ export default function (sequelize, DataTypes) {
       validate: {
         notEmpty: {
           arg: true,
-          msg: 'Role cannot be empty'
+          msg: 'Role can\'t be empty'
         },
         isIn: {
           args: [['admin', 'driver', 'attendant', 'gas_station_owner']],

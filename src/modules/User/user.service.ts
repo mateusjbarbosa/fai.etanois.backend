@@ -11,8 +11,9 @@ class User {
   constructor() {}
 
   create(user: any): Promise<any>{
-    if (user.phone_number || user.email) {
+    if (user.username && user.email) {
       user['etacoins'] = 0;
+
       return model.User.create(user)
       .then((userCreated) => {
         if (user.hasOwnProperty('user_preference_fuel')) {
@@ -23,7 +24,7 @@ class User {
         }
       });
     } else {
-      throw new Error('Phone number or email is required').message;
+      throw new Error('Username and email are required').message;
     }
   }
   
@@ -45,8 +46,8 @@ class User {
     .then(create);
   }
 
-  getUserForAuthorization(email: string, phone_number: string) {
-    const query = this.generateQueryByCredential(email, phone_number);
+  getUserForAuthorization(email: string, username: string) {
+    const query = this.generateQueryByCredential(email, username);
     
     return model.User.findOne({
       where: {
@@ -64,10 +65,6 @@ class User {
       switch (property)
       {
         case 'id':
-          fields.push(property);
-        break;
-
-        case 'phone_number':
           fields.push(property);
         break;
 
@@ -117,8 +114,8 @@ class User {
     });
   }
 
-  forgotPassword(email: string, phone_number: string) {
-    const query = this.generateQueryByCredential(email, phone_number);
+  forgotPassword(email: string, username: string) {
+    const query = this.generateQueryByCredential(email, username);
 
     return model.User.findOne({
       where: {
@@ -139,15 +136,15 @@ class User {
     });
   }
 
-  private generateQueryByCredential(email: string, phone_number: string): object {
+  private generateQueryByCredential(email: string, username: string): object {
     let query = {};
 
     if (email) {
       query['email'] = email;
     }
 
-    if (phone_number) {
-      query['phone_number'] = phone_number
+    if (username) {
+      query['username'] = username
     }
 
     return query

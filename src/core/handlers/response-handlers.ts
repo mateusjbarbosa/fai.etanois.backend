@@ -21,7 +21,7 @@ class Handlers {
 
   generateToken(res: Response, data: any) {
     const payload = {id: data.id, password: data.password, email: data.email,
-      phone_number: data.phone_number};
+      username: data.username};
 
     res.status(HttpStatus.OK).json({
       token: jwt.encode(payload, Configuration.secret)
@@ -42,7 +42,6 @@ class Handlers {
 
   dbErrorHandler(res: Response, err: any) {
     let errors: string[] = new Array();
-    console.log(`Db error: ${err}`)
 
     if (err.errors) {
       err.errors.forEach(element => {
