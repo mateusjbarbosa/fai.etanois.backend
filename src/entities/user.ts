@@ -88,34 +88,28 @@ export default function (sequelize, DataTypes) {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: {
           args: true,
           msg: 'Password can\'t be empty'
-        },
-        notNull: {
-          msg: 'Password is required'
         }
       }
     },
     cep: {
       type: DataTypes.STRING(8),
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: true,
         len: {
           args: [8, 8],
           msg: 'CEP is invalid'
-        },
-        notNull: {
-          msg: 'CEP is required'
         }
       },
     },
     search_distance_with_route: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: {
           args: true,
@@ -129,9 +123,6 @@ export default function (sequelize, DataTypes) {
           args: 10000,
           msg: 'The search distance with route can\'t exceed 10 kilometers'
         },
-        notNull: {
-          msg: 'Search distance with route  is required'
-        },
         isNumeric: {
           args: true,
           msg: 'Search distance with route must be numeric'
@@ -140,7 +131,7 @@ export default function (sequelize, DataTypes) {
     },
     search_distance_without_route: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: {
           args: true,
@@ -154,9 +145,6 @@ export default function (sequelize, DataTypes) {
           args: 10000,
           msg: 'The search distance without route can\'t exceed 10 kilometers'
         },
-        notNull: {
-          msg: 'Search distance without route  is required'
-        },
         isNumeric: {
           args: true,
           msg: 'Search distance without route must be numeric'
@@ -165,7 +153,7 @@ export default function (sequelize, DataTypes) {
     },
     payment_mode: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         notEmpty: {
           arg: true,
@@ -175,9 +163,6 @@ export default function (sequelize, DataTypes) {
         {
           args: [['money', 'credit_card', 'both']],
           msg: 'Payment format is invalid'
-        },
-        notNull: {
-          msg: 'Payment format is required'
         }
       },
     },
