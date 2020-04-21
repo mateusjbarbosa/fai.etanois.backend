@@ -20,7 +20,8 @@ export class UserIntegrationTest {
         cep: '37540000',
         username: 'userTest',
         payment_mode: EPaymentMode.CREDIT_CARD,
-        search_distance: 100
+        search_distance_without_route: 100,
+        search_distance_with_route: 500
       };
       const userDefault: IUser = {
         id: 1,
@@ -30,7 +31,8 @@ export class UserIntegrationTest {
         cep: '37548000',
         payment_mode: EPaymentMode.MONEY,
         username: 'userDafault',
-        search_distance: 1000,
+        search_distance_without_route: 1000,
+        search_distance_with_route: 500,
         role: EUserRoles.ADMIN
       };
       let token: string;
@@ -115,8 +117,9 @@ export class UserIntegrationTest {
             expect(res.status).to.equal(status.OK);
             expect(res.body.payload.id).to.equal(userDefault.id);
             expect(res.body.payload).to.have.all.keys(
-              ['id', 'name', 'email', "cep", 'payment_mode', 'username', 'search_distance',
-                'etacoins', 'UserPreferenceFuels']);
+              ['id', 'name', 'email', "cep", 'payment_mode', 'username',
+              'search_distance_with_route', 'search_distance_without_route', 'etacoins',
+              'UserPreferenceFuels']);
             done(error);
           });
         });
@@ -132,7 +135,8 @@ export class UserIntegrationTest {
             username: 'newUser',
             cep: '37548000',
             payment_mode: EPaymentMode.MONEY,
-            search_distance: 1000,
+            search_distance_without_route: 1000,
+            search_distance_with_route: 5000,
             role: EUserRoles.DRIVER
           };
     

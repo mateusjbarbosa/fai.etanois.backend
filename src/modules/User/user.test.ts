@@ -6,7 +6,7 @@ export class UserTest {
   constructor() {}
 
   private propetyExpected: string[] = ['email', 'id', 'name', 'cep', 'payment_mode', 'username',
-  'search_distance', 'etacoins', 'UserPreferenceFuels'];
+  'search_distance_with_route', 'search_distance_without_route', 'etacoins', 'UserPreferenceFuels'];
 
   public runTests(): void {
     describe('Unit Test: User', () => {
@@ -19,7 +19,8 @@ export class UserTest {
         password: '1234',
         username: 'userDefault',
         cep: '37540000',
-        search_distance: 1000,
+        search_distance_with_route: 1000,
+        search_distance_without_route: 2000,
         payment_mode: EPaymentMode.BOTH,
         role: EUserRoles.ADMIN
       };
@@ -48,7 +49,8 @@ export class UserTest {
             username: 'newUser',
             password: '1234',
             cep: '37548000',
-            search_distance: 200,
+            search_distance_with_route: 100,
+            search_distance_without_route: 200,
             payment_mode: EPaymentMode.CREDIT_CARD,
           };
     
