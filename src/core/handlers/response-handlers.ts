@@ -12,12 +12,16 @@ class Handlers {
     const isMatch = bcrypt.compareSync(password, data.password);
 
     if (isMatch) {
-      const token = Authenticate.getToken(data);
-
-      res.status(HttpStatus.OK).json({ token: token });
+      this.sendToken(res, data)
     } else {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
+  }
+
+  sendToken(res: Response, user: any) {
+    const token = Authenticate.getToken(user);
+
+    res.status(HttpStatus.OK).json({ token: token });
   }
 
   onSuccess(res: Response, data: any) {

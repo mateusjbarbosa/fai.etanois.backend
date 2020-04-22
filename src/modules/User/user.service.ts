@@ -165,7 +165,8 @@ class User {
       if (id) {
         return model.User.findOne({
           where: {id}
-        }).then(getUserForAuthorization);
+        })
+        .then(getUserForAuthorization);
       }
     });
   }
