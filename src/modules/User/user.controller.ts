@@ -90,7 +90,7 @@ class UserController {
 
     User.recoveryPassword(token)
     .then(data => {
-      Handlers.generateToken(res, data);
+      Handlers.authSuccess(res, data.password, data);
     })
     .catch(_.partial(Handlers.onError, res, 'Invalid token'));
   }

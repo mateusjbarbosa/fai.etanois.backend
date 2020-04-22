@@ -1,6 +1,8 @@
 import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
   generateRandomToken} from './user.module';
+import Authenticate from '../Auth/authenticate.service';
 import Redis from '../../core/redis/redis';
+import Nodemailer from '../../core/nodemailer/nodemailer';
 import * as Bluebird from 'bluebird';
 import * as bcrypt from 'bcrypt';
 const model = require('../../entities');
@@ -10,26 +12,48 @@ class User {
 
   constructor() {}
 
-  create(user: any): Promise<any>{
+  public create(user: any): Promise<any> {
+    const successfulRegistration = {msg: 'Created user'};
     user['etacoins'] = 0;
 
-    return new Promise((resolve, reject) => {
-      model.User.create(user)
-      .then((userCreated) => {
+    return new Promise(async(resolve, reject) => {
+      const transaction = await model.sequelize.transaction();
+
+      try {
+        const userCreated = await model.User.create(user, { transaction: transaction});
+
         if (user.hasOwnProperty('user_preference_fuel')) {
-          return user.user_preference_fuel.reduce((prev, object) => {
+          user.user_preference_fuel.forEach(object => {
             object['user_id'] = userCreated.dataValues.id;
-            model.UserPreferenceFuel.create(object);
-          }, resolve({msg: 'Created user'}));
-        } else {
-          resolve({msg: 'Created user'})
+          });
+
+          try {
+            await model.UserPreferenceFuel.bulkCreate(user.user_preference_fuel,
+              {transaction: transaction})
+          } catch(err) {
+            await transaction.rollback();
+            reject({ errors: [{message: 'Fuel is not registered'}] });
+            return;
+          }
         }
-      })
-      .catch(err => {reject(err)});
+
+        Nodemailer.sendEmailActivateAccount(user.email, Authenticate.getToken(user))
+        .then(async(msg) => {
+          await transaction.commit();
+          resolve(successfulRegistration)  
+        })
+        .catch(async(err) => {
+          await transaction.rollback();
+          reject({ errors: [{message: 'Internal server error: ERR-01'}] });
+        });
+      } catch(err) {
+        await transaction.rollback();
+        reject(err);
+      }
     });
   }
   
-  getAll(): Bluebird<IUserDetail[]>{
+  public getAll(): Bluebird<IUserDetail[]>{
     return model.User.findAll({
       order: ['name'],
       include: [{
@@ -38,7 +62,7 @@ class User {
     .then(createUsers);
   }
   
-  getById(id: number): Bluebird<IUserDetail>{
+  public getById(id: number): Bluebird<IUserDetail>{
     return model.User.findOne({
       where: {id},
       include: [{
@@ -47,7 +71,7 @@ class User {
     .then(create);
   }
 
-  getUserForAuthorization(email: string, username: string) {
+  public getUserForAuthorization(email: string, username: string) {
     const query = this.generateQueryByCredential(email, username);
     
     return model.User.findOne({
@@ -58,7 +82,7 @@ class User {
     .then(getUserForAuthorization);
   }
 
-  update(id: number, user: any, role: EUserRoles){
+  public update(id: number, user: any, role: EUserRoles){
     const keys = Object.keys(user);
     let fields: string[] = [];
 
@@ -113,7 +137,7 @@ class User {
     .then(create);
   }
 
-  delete(id: number){
+  public delete(id: number){
     return model.User.destroy({
       where: {id}
     });

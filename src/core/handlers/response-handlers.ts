@@ -1,8 +1,7 @@
 import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
+import Authenticate from '../../modules/Auth/authenticate.service';
 import * as HttpStatus from 'http-status';
-import * as jwt from 'jwt-simple';
 import * as bcrypt from 'bcrypt';
-import Configuration from '../../config/config';
 
 class Handlers {
   authFail(req: Request, res: Response) {
@@ -13,19 +12,12 @@ class Handlers {
     const isMatch = bcrypt.compareSync(password, data.password);
 
     if (isMatch) {
-      this.generateToken(res, data)
+      const token = Authenticate.getToken(data);
+
+      res.status(HttpStatus.OK).json({ token: token });
     } else {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
-  }
-
-  generateToken(res: Response, data: any) {
-    const payload = {id: data.id, password: data.password, email: data.email,
-      username: data.username};
-
-    res.status(HttpStatus.OK).json({
-      token: jwt.encode(payload, Configuration.secret)
-    });
   }
 
   onSuccess(res: Response, data: any) {

@@ -1,6 +1,8 @@
 import { Request, Response} from 'express';
 import Handlers from '../../core/handlers/response-handlers';
+import Configuration from '../../config/config';
 import { EUserRoles } from '../User/user.module';
+import * as jwt from 'jwt-simple';
 
 class Authenticate {
   constructor() {}
@@ -31,6 +33,13 @@ class Authenticate {
     }
 
     return authorized;
+  }
+
+  public getToken(data: any) {
+    const payload = {id: data.id, password: data.password, email: data.email,
+      username: data.username};
+
+    return jwt.encode(payload, Configuration.secret)
   }
 }
 

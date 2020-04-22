@@ -171,6 +171,7 @@ export default function (sequelize, DataTypes) {
     },
     role: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         notEmpty: {
           arg: true,
@@ -179,9 +180,26 @@ export default function (sequelize, DataTypes) {
         isIn: {
           args: [['admin', 'driver', 'attendant', 'gas_station_owner']],
           msg: 'Unrecognized role'
+        },
+        notNull: {
+          msg: 'Role is required'
         }
       },
       defaultValue: 'driver'
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          arg: true,
+          msg: 'Active can\'t be empty'
+        },
+        notNull: {
+          msg: 'Active is required'
+        }
+      },
+      defaultValue: false
     }
   });
 
