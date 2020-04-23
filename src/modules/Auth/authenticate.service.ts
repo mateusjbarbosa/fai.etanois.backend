@@ -1,10 +1,16 @@
 import { Request, Response} from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import Handlers from '../../core/handlers/response-handlers';
 import Configuration from '../../config/config';
 import { EUserRoles } from '../User/user.module';
 import * as jwt from 'jwt-simple';
 
 class Authenticate {
+  private opts = {
+    secretOrKey: Configuration.secret,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+  };
+
   constructor() {}
 
   public authorized = (req: Request, res: Response, user: any, allowedRoles: EUserRoles[]) => {
@@ -40,6 +46,14 @@ class Authenticate {
       username: data.username};
 
     return jwt.encode(payload, Configuration.secret)
+  }
+
+  public getJwtPayload(token: string) {
+    try {
+      return jwt.decode(token, Configuration.secret)
+    } catch {
+      throw new Error('');
+    }
   }
 }
 

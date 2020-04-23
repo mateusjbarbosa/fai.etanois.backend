@@ -63,8 +63,15 @@ class User {
   }
   
   public getById(id: number): Bluebird<IUserDetail>{
+    let query = {};
+
+    query['id'] = id;
+    query['activate'] = true;
+
     return model.User.findOne({
-      where: {id},
+      where: {
+        [Op.and]: [query]
+      },
       include: [{
         model: model.UserPreferenceFuel}]
     })
@@ -84,16 +91,18 @@ class User {
 
   public update(id: number, user: any, role: EUserRoles){
     const keys = Object.keys(user);
+    let query = {};
     let fields: string[] = [];
 
     keys.forEach(property => {
       switch (property)
       {
-        case 'id':
-          fields.push(property);
-        break;
-
         case 'email':
+        case 'id':
+        case 'name':
+        case 'search_distance_with_route':
+        case 'search_distance_without_route':
+        case 'payment_mode':
           fields.push(property);
         break;
 
@@ -101,22 +110,6 @@ class User {
           const salt = bcrypt.genSaltSync(10);
           
           user.password = bcrypt.hashSync(user.password, salt)
-          fields.push(property);
-        break;
-
-        case 'name':
-            fields.push(property);
-        break;
-
-        case 'search_distance_with_route':
-          fields.push(property);
-        break;
-
-        case 'search_distance_without_route':
-          fields.push(property);
-        break;
-
-        case 'payment_mode':
           fields.push(property);
         break;
 
@@ -128,8 +121,13 @@ class User {
       }
     });
 
+    query['id'] = id;
+    query['activate'] = true;
+
     return model.User.update(user, {
-      where: {id},
+      where: {
+        [Op.and]: [query]
+      },
       fields: fields,
       hooks: true,
       individualHooks: true
@@ -143,7 +141,7 @@ class User {
     });
   }
 
-  forgotPassword(email: string, username: string) {
+  public forgotPassword(email: string, username: string) {
     const query = this.generateQueryByCredential(email, username);
 
     return new Promise((resolve, reject) => {
@@ -158,17 +156,57 @@ class User {
     });
   }
 
-  recoveryPassword(token: string) {
+  public recoveryPassword(token: string) {
     const redis = new Redis();
+    let query = {};
 
     return redis.verifyExistenceToken(token).then(id => {
       if (id) {
+        query['id'] = id;
+        query['activate'] = true;
+
         return model.User.findOne({
-          where: {id}
+          where: {
+            [Op.and]: [query]
+          }
         })
         .then(getUserForAuthorization);
       }
     });
+  }
+
+  public activateAccount(token: string) {
+    try {
+      const user = Authenticate.getJwtPayload(token)
+      .catch(err => {})
+      const keys = Object.keys(user)
+      let query = {}
+  
+      user['activate'] = true;
+  
+      keys.forEach(property => {
+        switch(property) {
+          case 'email':
+          case 'username':
+              query[property] = user[property];
+          break;
+        }
+      });
+  
+      query['activate'] = false;
+  
+      return model.User.update(user, {
+        where: {
+          [Op.and]: [query]
+        },
+        fields: ['activate'],
+        hooks: true,
+        individualHooks: true
+      })
+      .then(create);
+    } catch {
+      throw new Error()
+    }
   }
 
   private generateQueryByCredential(email: string, username: string): object {
@@ -181,6 +219,8 @@ class User {
     if (username) {
       query['username'] = username
     }
+
+    query['activate'] = true;
 
     return query
   }

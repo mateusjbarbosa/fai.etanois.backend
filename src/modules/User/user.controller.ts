@@ -94,6 +94,17 @@ class UserController {
     })
     .catch(_.partial(Handlers.onError, res, 'Invalid token'));
   }
+
+  public activateAccout = (req: Request, res: Response) => {
+    const token = req.params.token;
+
+    try {
+      User.activateAccount(token)
+      .then(_.partial(Handlers.onSuccess, res))
+    } catch {
+      Handlers.onError(res, 'Invalid token');
+    }
+  }
 }
 
 export default new UserController();

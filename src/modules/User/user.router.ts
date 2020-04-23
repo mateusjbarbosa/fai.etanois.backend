@@ -35,6 +35,11 @@ export class UserRouterModule extends BaseRouterModule {
           endpoint: this.baseEndpoint + 'forgot_password/:token',
           callback: UserController.recovryPassword,
           isProtected: false
+        },
+        {
+          endpoint: this.baseEndpoint + 'activate_account/:token',
+          callback: UserController.activateAccout,
+          isProtected: false
         }
       ],
       patch: [

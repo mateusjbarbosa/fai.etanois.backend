@@ -187,16 +187,16 @@ export default function (sequelize, DataTypes) {
       },
       defaultValue: 'driver'
     },
-    active: {
+    activate: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       validate: {
         notEmpty: {
           arg: true,
-          msg: 'Active can\'t be empty'
+          msg: 'Activate can\'t be empty'
         },
         notNull: {
-          msg: 'Active is required'
+          msg: 'Activate is required'
         }
       },
       defaultValue: false
