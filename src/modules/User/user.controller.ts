@@ -62,14 +62,17 @@ class UserController {
   }
 
   public delete = (req: Request, res: Response) => {
-    const allowedRoles = [EUserRoles.ADMIN];
+    const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
     const userId = parseInt(req.params.id);
     
     if (Authenticate.authorized(req, res, req.user, allowedRoles))
     {
-      User.delete(userId)
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.onError, res, 'Error deleting user'));
+      if (Authenticate.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
+      {
+        User.delete(userId)
+        .then(_.partial(Handlers.onSuccess, res))
+        .catch(_.partial(Handlers.onError, res, 'Error deleting user'));
+      }
     }
   }
 
@@ -101,7 +104,8 @@ class UserController {
     try {
       User.activateAccount(token)
       .then(_.partial(Handlers.onSuccess, res))
-    } catch {
+      .catch(_.partial(Handlers.onError, res, 'User is already active'));
+    } catch(err) {
       Handlers.onError(res, 'Invalid token');
     }
   }

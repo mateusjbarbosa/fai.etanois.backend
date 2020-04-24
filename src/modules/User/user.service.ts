@@ -136,8 +136,16 @@ class User {
   }
 
   public delete(id: number){
-    return model.User.destroy({
-      where: {id}
+    const user = {
+      id: id,
+      activate: false
+    }
+
+    return model.User.update(user, {
+      where: {id},
+      fields: ['activate'],
+      hooks: true,
+      individualHooks: true
     });
   }
 
@@ -178,12 +186,11 @@ class User {
   public activateAccount(token: string) {
     try {
       const user = Authenticate.getJwtPayload(token)
-      .catch(err => {})
+
       const keys = Object.keys(user)
       let query = {}
   
       user['activate'] = true;
-  
       keys.forEach(property => {
         switch(property) {
           case 'email':
@@ -203,8 +210,11 @@ class User {
         hooks: true,
         individualHooks: true
       })
-      .then(create);
-    } catch {
+      .then(create)
+      .catch(err => {
+        throw new Error()  
+      });
+    } catch(err) {
       throw new Error()
     }
   }
