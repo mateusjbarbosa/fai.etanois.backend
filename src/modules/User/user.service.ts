@@ -41,15 +41,21 @@ class User {
     .then(create);
   }
 
-  public getUserForAuthorization(email: string, username: string) {
+  public async getUserForAuthorization(email: string, username: string): 
+    Promise<IUserForAuthorization> {
     const query = this.generateQueryByCredential(email, username);
     
-    return model.User.findOne({
+    const [err, success] = await to<any>(model.User.findOne({
       where: {
         [Op.and]: [query]
       }
-    })
-    .then(getUserForAuthorization);
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return (getUserForAuthorization(success));
   }
 
   public update(id: number, user: any, role: EUserRoles){

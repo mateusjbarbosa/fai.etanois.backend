@@ -182,7 +182,7 @@ class UserController {
       return;
     }
 
-    Handlers.onSuccess(res, success);
+    Handlers.onSuccess(res, {user: success});
   }
 }
 
