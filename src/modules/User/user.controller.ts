@@ -1,21 +1,84 @@
 import { Request, Response} from 'express';
 import * as _ from 'lodash';
 import User from './user.service';
+import FuelPreference from './fuel-preference.service';
 import Handlers from '../../core/handlers/response-handlers';
-import { EUserRoles } from './user.module';
+import Nodemailer from '../../core/nodemailer/nodemailer';
+import { EUserRoles, IUserDetail } from './user.module';
+import { to, findWithAttr } from '../../core/util/util';
 import Authenticate from '../Auth/authenticate.service'
+import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
+import Fuel from '../Fuel/fuel.service';
+import { IUserPreferenceFuel } from './fuel-preference.module';
 
 class UserController {
   constructor() {}
 
-  public create = (req: Request, res: Response) => {
-    try {
-      User.create(req.body)
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.dbErrorHandler, res))
-    } catch(error) {
-      Handlers.onError(res, error);
+  public create = async(req: Request, res: Response) => {
+    const body = req.body
+    let errors: string[] = [];
+    const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
+
+    body['etacoins'] = 0;
+
+    if (errCreateUser) {
+      Handlers.onError(res, errCreateUser.message);
+      return;
     }
+
+    if (body.hasOwnProperty('user_preference_fuel')) {
+      const[errFuel, fuels] = await to<IFuelDetail[]>(this.createFuelPreference(
+        body.user_preference_fuel, user.id, errors));
+
+      if (!errFuel) {
+        user.UserPreferenceFuels = fuels;
+      }
+    }
+
+    const [errEmail, successEmail] =
+      await to<any>(Nodemailer.sendEmailActivateAccount(user.email, Authenticate.getToken(user)));
+
+    if (errEmail) {
+      errors.push('It was not possible to send the email');
+    }
+
+    Handlers.onSuccess(res, {user: user, msg: errors});
+  }
+
+  private async createFuelPreference(fuelPreference: IFuelDetail[], userId: number, errors: any[]):
+    Promise<IFuelDetail[]> {
+    const [err, fuels] = await to<IFuel[]>(Fuel.getAll());
+    let userPreference: IFuelDetail[] = [];
+
+    if (err) {
+      errors.push('It was not possible to create the fuels');
+      return;
+    }
+
+    const promises = fuelPreference.map(async (object) => {
+      const index = findWithAttr(fuels, 'name', object.name);
+
+      if (index >= 0) {
+        const fuelDetail: IUserPreferenceFuel = {fuel_id: fuels[index].id, user_id: userId};
+        
+        const [errFuel, fuelCreated] = 
+          await to<IUserPreferenceFuel>(FuelPreference.create(fuelDetail));
+
+        if (errFuel) {
+          errors.push(`Unable to associate user with ${object.name}`);
+        } else {
+          const fuelPreferenceDetail: IFuelDetail = {name: object.name};
+          
+          userPreference.push(fuelPreferenceDetail);
+        }
+      } else {
+        errors.push(`Unable to associate user with ${object.name}`);
+      }
+    });
+
+    await Promise.all(promises);
+
+    return (userPreference);
   }
 
   public readOnly = (req: Request, res: Response) => {

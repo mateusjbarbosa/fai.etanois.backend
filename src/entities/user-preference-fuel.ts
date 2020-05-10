@@ -5,8 +5,8 @@ export default function (sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
-    fuel_name: {
-      type: DataTypes.STRING(50),
+    fuel_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notEmpty: {

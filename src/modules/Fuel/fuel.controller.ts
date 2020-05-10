@@ -19,7 +19,7 @@ class FuelController {
     }
   }
 
-  public readAll = (req: Request, res: Response) => {
+  public readAll = (req: Request, res: Response) => { 
     Fuel.getAll()
     .then(_.partial(Handlers.onSuccess, res))
     .catch(_.partial(Handlers.onError, res, 'Error fetching all fuels'));

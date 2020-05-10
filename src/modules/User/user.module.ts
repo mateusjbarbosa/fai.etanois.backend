@@ -1,6 +1,7 @@
 import * as crypto from 'crypto'
 import Redis from '../../core/redis/redis';
 import Nodemailer from '../../core/nodemailer/nodemailer';
+import { IFuelDetail } from '../Fuel/fuel.module';
 
 export enum EUserRoles {
   ADMIN = 'admin',
@@ -27,7 +28,7 @@ export interface IUser {
   payment_mode: EPaymentMode,
   etacoins?: number
   role?: EUserRoles,
-  UserPreferenceFuels?: IUserPreferenceFuel[]
+  UserPreferenceFuels?: IFuelDetail[]
 }
 
 export interface IUserDetail {
@@ -40,11 +41,7 @@ export interface IUserDetail {
   search_distance_with_route: number,
   search_distance_without_route: number,
   etacoins?: number
-  UserPreferenceFuels?: IUserPreferenceFuel[]
-}
-
-export interface IUserPreferenceFuel {
-  fuel_name: string
+  UserPreferenceFuels?: IFuelDetail[]
 }
 
 export interface IUserForAuthorization {

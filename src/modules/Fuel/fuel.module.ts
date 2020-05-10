@@ -1,12 +1,17 @@
 export interface IFuel {
   name: string
+  id: number
+}
+
+export interface IFuelDetail {
+  name: string
 }
 
 export function create(fuel: any): IFuel {
   if (fuel) {
-    const { name } = fuel;
+    const { name, id } = fuel;
 
-    return ({ name })
+    return ({ name, id })
   }
 }
 
