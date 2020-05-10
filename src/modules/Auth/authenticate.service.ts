@@ -48,12 +48,10 @@ class Authenticate {
     return jwt.encode(payload, Configuration.secret)
   }
 
-  public getJwtPayload(token: string) {
-    try {
-      return jwt.decode(token, Configuration.secret)
-    } catch {
-      throw new Error('');
-    }
+  public getJwtPayload(token: string): Promise<any> {
+    return new Promise((resolve) => {
+      resolve (jwt.decode(token, Configuration.secret))
+    });
   }
 }
 

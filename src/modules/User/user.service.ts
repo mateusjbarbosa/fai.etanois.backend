@@ -1,10 +1,9 @@
 import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
-  generateRandomToken,
-  IUser} from './user.module';
-import Authenticate from '../Auth/authenticate.service';
+  generateRandomToken, IUserForAuthorization} from './user.module';
 import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
 import * as bcrypt from 'bcrypt';
+import { to } from '../../core/util/util';
 const model = require('../../entities');
 const { Op } = require("sequelize");
 
@@ -157,40 +156,37 @@ class User {
     });
   }
 
-  public activateAccount(token: string) {
-    try {
-      const user = Authenticate.getJwtPayload(token)
+  public async activateAccount(user: IUserForAuthorization): Promise<IUserDetail> {
+    const keys = Object.keys(user)
 
-      const keys = Object.keys(user)
-      let query = {}
+    let query = {}
   
-      user['activate'] = true;
-      keys.forEach(property => {
-        switch(property) {
-          case 'email':
-          case 'username':
-              query[property] = user[property];
-          break;
-        }
-      });
-  
-      query['activate'] = false;
-  
-      return model.User.update(user, {
+    user['activate'] = true;
+    keys.forEach(property => {
+      switch(property) {
+        case 'email':
+        case 'username':
+            query[property] = user[property];
+        break;
+      }
+    });
+
+    query['activate'] = false;
+
+    const [err, success] = await to<any>(model.User.update(user, {
         where: {
           [Op.and]: [query]
         },
         fields: ['activate'],
         hooks: true,
         individualHooks: true
-      })
-      .then(create)
-      .catch(err => {
+      }));
+    
+      if (err) {
         throw new Error()  
-      });
-    } catch(err) {
-      throw new Error()
-    }
+      }
+      
+      return create(success);
   }
 
   private generateQueryByCredential(email: string, username: string): object {

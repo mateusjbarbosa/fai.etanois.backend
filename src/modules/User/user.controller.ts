@@ -4,7 +4,7 @@ import User from './user.service';
 import FuelPreference from './fuel-preference.service';
 import Handlers from '../../core/handlers/response-handlers';
 import Nodemailer from '../../core/nodemailer/nodemailer';
-import { EUserRoles, IUserDetail } from './user.module';
+import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
 import { to, findWithAttr } from '../../core/util/util';
 import Authenticate from '../Auth/authenticate.service'
 import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
@@ -81,7 +81,7 @@ class UserController {
     return (userPreference);
   }
 
-  public readOnly = (req: Request, res: Response) => {
+  public readOnly = async(req: Request, res: Response) => {
     const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
     const userId = parseInt(req.params.id);
     
@@ -89,9 +89,13 @@ class UserController {
     { 
       if (Authenticate.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
       {
-        User.getById(userId)
-        .then(_.partial(Handlers.onSuccess, res))
-        .catch(_.partial(Handlers.onError, res, 'User not found'));
+        const [err, success] = await to<IUserDetail>(User.getById(userId));
+        
+        if (err) {
+          Handlers.onError(res, 'User not found');
+        } else {
+          Handlers.onSuccess(res, success);
+        }
       }
     }
   }
@@ -161,16 +165,24 @@ class UserController {
     .catch(_.partial(Handlers.onError, res, 'Invalid token'));
   }
 
-  public activateAccout = (req: Request, res: Response) => {
-    const token = req.params.token;
+  public activateAccout = async (req: Request, res: Response) => {
+    const [errToken, user] =
+      await to<IUserForAuthorization>(Authenticate.getJwtPayload(req.params.token));
 
-    try {
-      User.activateAccount(token)
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.onError, res, 'User is already active'));
-    } catch(err) {
+    if (errToken) {
+      console.log(errToken)
       Handlers.onError(res, 'Invalid token');
+      return;
     }
+
+    const [errActivate, success] = await to<IUserDetail>(User.activateAccount(user));
+
+    if (errActivate) {
+      Handlers.onError(res, 'User is already active');
+      return;
+    }
+
+    Handlers.onSuccess(res, success);
   }
 }
 
