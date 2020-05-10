@@ -93,9 +93,10 @@ class UserController {
         
         if (err) {
           Handlers.onError(res, 'User not found');
-        } else {
-          Handlers.onSuccess(res, success);
+          return;
         }
+
+        Handlers.onSuccess(res, success);
       }
     }
   }

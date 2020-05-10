@@ -25,20 +25,26 @@ class User {
     .then(createUsers);
   }
   
-  public getById(id: number): Bluebird<IUserDetail>{
+  public async getById(id: number): Bluebird<IUserDetail>{
     let query = {};
 
     query['id'] = id;
     query['activate'] = true;
 
-    return model.User.findOne({
+    const [err, success] = await to<any>(model.User.findOne({
       where: {
         [Op.and]: [query]
       },
-      include: [{
-        model: model.UserPreferenceFuel}]
-    })
-    .then(create);
+      include: [
+        { model: model.UserPreferenceFuel,
+        include: { model: model.Fuel } }],
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return create(success);
   }
 
   public async getUserForAuthorization(email: string, username: string): 

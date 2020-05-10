@@ -2,6 +2,7 @@ import * as crypto from 'crypto'
 import Redis from '../../core/redis/redis';
 import Nodemailer from '../../core/nodemailer/nodemailer';
 import { IFuelDetail } from '../Fuel/fuel.module';
+import userPreferenceFuel from '../../entities/user-preference-fuel';
 
 export enum EUserRoles {
   ADMIN = 'admin',
@@ -74,12 +75,13 @@ export function create(user: any): IUserDetail {
       cep, payment_mode, etacoins, UserPreferenceFuels} = userObject;
       
       if (UserPreferenceFuels) {
+        const preferenceFuelList: IFuelDetail[] = [];
+
         UserPreferenceFuels.forEach(item => {
-          delete item.dataValues.id
-          delete item.dataValues.user_id
-          delete item.dataValues.createdAt
-          delete item.dataValues.updatedAt
-        })
+          preferenceFuelList.push({name: item.dataValues.Fuel.dataValues.name})
+        });
+
+        UserPreferenceFuels = preferenceFuelList;
       }
 
       search_distance_with_route = parseInt(search_distance_with_route)
