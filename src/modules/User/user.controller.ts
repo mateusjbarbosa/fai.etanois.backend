@@ -24,7 +24,7 @@ class UserController {
     body['etacoins'] = 0;
 
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
-    console.log(errCreateUser)
+    
     if (errCreateUser) {
       Handlers.dbErrorHandler(res, errCreateUser);
       return;
@@ -96,7 +96,6 @@ class UserController {
         const [err, success] = await to<IUserDetail>(User.getById(userId));
         
         if (err) {
-          console.log(err)
           Handlers.onError(res, 'User not found');
           return;
         }
