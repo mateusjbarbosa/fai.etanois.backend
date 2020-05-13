@@ -11,6 +11,12 @@ export function create(fuelPreference: any): IUserPreferenceFuel {
   return ({ user_id, fuel_id });
 }
 
-export function createFuelPreferences(fuelPreferences: any[]) {
-  return fuelPreferences.map(create);
+export function createFuelDetail(fuel_preference: any): IFuelDetail[] {
+  const fuels: IFuelDetail[] = [];
+
+  fuel_preference.forEach(element => {
+    fuels.push({name: element.Fuel.dataValues.name})
+  });
+
+  return fuels
 }

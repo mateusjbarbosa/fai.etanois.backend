@@ -29,7 +29,7 @@ export interface IUser {
   payment_mode: EPaymentMode,
   etacoins?: number
   role?: EUserRoles,
-  UserPreferenceFuels?: IFuelDetail[]
+  user_preference_fuels?: IFuelDetail[]
 }
 
 export interface IUserDetail {
@@ -42,7 +42,7 @@ export interface IUserDetail {
   search_distance_with_route: number,
   search_distance_without_route: number,
   etacoins?: number
-  UserPreferenceFuels?: IFuelDetail[]
+  user_preference_fuels?: IFuelDetail[]
 }
 
 export interface IUserForAuthorization {
@@ -69,26 +69,23 @@ export function create(user: any): IUserDetail {
       throw new Error()
     }
   }
-  
+
   if (userObject) {
     let {id, search_distance_with_route, search_distance_without_route, username, email, name,
       cep, payment_mode, etacoins, UserPreferenceFuels} = userObject;
-      
+    const user_preference_fuels: IFuelDetail[] = [];
+
       if (UserPreferenceFuels) {
-        const preferenceFuelList: IFuelDetail[] = [];
-
         UserPreferenceFuels.forEach(item => {
-          preferenceFuelList.push({name: item.dataValues.Fuel.dataValues.name})
+          user_preference_fuels.push({name: item.dataValues.Fuel.dataValues.name})
         });
-
-        UserPreferenceFuels = preferenceFuelList;
       }
 
       search_distance_with_route = parseInt(search_distance_with_route)
       search_distance_without_route = parseInt(search_distance_without_route)
       
     return {id, username, email, name, cep, payment_mode, search_distance_with_route, etacoins,
-      search_distance_without_route, UserPreferenceFuels};
+      search_distance_without_route, user_preference_fuels};
   }
 
   return null

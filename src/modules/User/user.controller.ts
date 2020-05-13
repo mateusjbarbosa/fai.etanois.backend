@@ -10,6 +10,7 @@ import Authenticate from '../Auth/authenticate.service'
 import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
 import Fuel from '../Fuel/fuel.service';
 import { IUserPreferenceFuel } from './fuel-preference.module';
+import * as bcrypt from 'bcrypt';
 
 class UserController {
   constructor() {}
@@ -31,7 +32,7 @@ class UserController {
         body.user_preference_fuel, user.id, errors));
 
       if (!errFuel) {
-        user.UserPreferenceFuels = fuels;
+        user.user_preference_fuels = fuels;
       }
     }
 
@@ -92,6 +93,7 @@ class UserController {
         const [err, success] = await to<IUserDetail>(User.getById(userId));
         
         if (err) {
+          console.log(err)
           Handlers.onError(res, 'User not found');
           return;
         }
@@ -112,19 +114,76 @@ class UserController {
     }
   }
 
-  public update = (req: Request, res: Response) => {
+  public update = async (req: Request, res: Response) => {
     const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
-    const userId = parseInt(req.params.id);
-    const props = req.body;
+    const user_id = parseInt(req.params.id);
+    const user = req.body;
+    const role = req.user['role'];
+    const errors: string[] = [];
+    let update_fuel_preference: boolean = false;
     
     if (Authenticate.authorized(req, res, req.user, allowedRoles))
     {
-      if (Authenticate.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
+      if (Authenticate.verifyUserType(req, res, role, user_id, req.user['id']))
       {
-        User.update(userId, props, req.user['role'])
-        .then(_.partial(Handlers.onSuccess, res))
-        .catch(_.partial(Handlers.dbErrorHandler, res))
-        .catch(_.partial(Handlers.onError, res, 'Error updating user'));
+        const keys = Object.keys(user);
+        let fields: string[] = [];
+
+        keys.forEach(async property => {
+          switch (property)
+          {
+            case 'email':
+            case 'id':
+            case 'name':
+            case 'search_distance_with_route':
+            case 'search_distance_without_route':
+            case 'payment_mode':
+              fields.push(property);
+            break;
+    
+            case 'password':
+              const salt = bcrypt.genSaltSync(10);
+              
+              user.password = bcrypt.hashSync(user.password, salt)
+              fields.push(property);
+            break;
+    
+            case 'etacoins':
+              if (role == EUserRoles.ADMIN) {
+                fields.push(property);
+              }
+            break;
+
+            case 'user_preference_fuels':
+              update_fuel_preference = true;
+            break;
+          }
+        });
+
+        const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
+
+        if (err) {
+          Handlers.dbErrorHandler(res, err);
+          return;
+        }
+
+        if (update_fuel_preference) {
+          const [err_delete_fuel_pref, success_delete_fuel_pref] = 
+          await to<any>(FuelPreference.deleteByUser(user_id));
+
+        const [err_create_preference_fuel, success_create_preference_fuel] = 
+          await to<IFuelDetail[]>(this.createFuelPreference(
+            user['user_preference_fuels'], user_id, errors));
+        }
+        
+        const [err_fuel_preference, success_fuel_preference] = 
+          await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
+
+        if (!err_fuel_preference) {
+          success['user_preference_fuels'] = success_fuel_preference;
+        }
+
+        Handlers.onSuccess(res, {user: success, msg: errors});
       }
     }
   }

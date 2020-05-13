@@ -1,5 +1,6 @@
 import { IFuel, createFuels, create } from './fuel.module';
 import * as Bluebird from 'bluebird';
+import { to } from '../../core/util/util';
 const model = require('../../entities');
 
 class Fuel {
@@ -13,11 +14,16 @@ class Fuel {
     }
   }
   
-  getAll(): Bluebird<IFuel[]>{
-    return model.Fuel.findAll({
+  public async getAll(): Bluebird<IFuel[]>{
+    const [err, success] = await to<any>(model.Fuel.findAll({
       order: ['name']
-    })
-    .then(createFuels);
+    }));
+
+    if (err) {
+      console.log(err);
+    }
+
+    return createFuels(success);
   }
 
   update(oldName: string, newName: string){

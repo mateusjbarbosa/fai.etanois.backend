@@ -2,7 +2,6 @@ import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles,
   generateRandomToken, IUserForAuthorization} from './user.module';
 import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
-import * as bcrypt from 'bcrypt';
 import { to } from '../../core/util/util';
 const model = require('../../entities');
 const { Op } = require("sequelize");
@@ -37,7 +36,7 @@ class User {
       },
       include: [
         { model: model.UserPreferenceFuel,
-        include: { model: model.Fuel } }],
+          include: { model: model.Fuel } }],
     }));
 
     if (err) {
@@ -64,60 +63,26 @@ class User {
     return (getUserForAuthorization(success));
   }
 
-  public update(id: number, user: any, role: EUserRoles){
-    return new Promise(async(resolve, reject) => {
-      const transaction = await model.sequelize.transaction();
-      const keys = Object.keys(user);
-      let query = {};
-      let fields: string[] = [];
+  public async update(id: number, user: any, fields: string[]): Promise<IUserDetail>{
+    let query = {};
   
-      keys.forEach(property => {
-        switch (property)
-        {
-          case 'email':
-          case 'id':
-          case 'name':
-          case 'search_distance_with_route':
-          case 'search_distance_without_route':
-          case 'payment_mode':
-            fields.push(property);
-          break;
-  
-          case 'password':
-            const salt = bcrypt.genSaltSync(10);
-            
-            user.password = bcrypt.hashSync(user.password, salt)
-            fields.push(property);
-          break;
-  
-          case 'etacoins':
-            if (role == EUserRoles.ADMIN) {
-              fields.push(property);
-            }
-          break;
-        }
-      });
-  
-      query['id'] = id;
-      query['activate'] = true;
-  
-      try {
-        const userUpdated = await model.User.update(user, {
-          where: {
-            [Op.and]: [query]
-          },
-          fields: fields,
-          hooks: true,
-          individualHooks: true
-        }, { transaction: transaction });
+    query['id'] = id;
+    query['activate'] = true;
 
-        await transaction.commit();
-        resolve(userUpdated)
-      } catch(err) {
-        await transaction.rollback();
-        reject(err);
-      }
-    })
+    const [err, success] = await to<any>(model.User.update(user, {
+      where: {
+        [Op.and]: [query]
+      },
+      fields: fields,
+      hooks: true,
+      individualHooks: true
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return create(success);
   }
 
   public delete(id: number){
