@@ -1,21 +1,27 @@
-import { Request, Response} from 'express';
 import * as _ from 'lodash';
 import Authenticate from '../Auth/authenticate.service'
 import Fuel from './fuel.service';
 import Handlers from '../../core/handlers/response-handlers';
+import { Request, Response} from 'express';
+import { IFuel } from './fuel.module';
+import { to } from '../../core/util/util';
+
 
 class FuelController {
   constructor() {}
 
-  public create = (req: Request, res: Response) => {
+  public create = async (req: Request, res: Response) => {
     if (Authenticate.verifyUserType(req, res, req.user['role'], 0, req.user['id'])) {
-      try {
-        Fuel.create(req.body)
-        .then(_.partial(Handlers.onSuccess, res))
-        .catch(_.partial(Handlers.dbErrorHandler, res))
-      } catch(error) {
-        Handlers.onError(res, error);
+      const new_fuel = req.body;
+
+      const [err, fuel] = await to<IFuel>(Fuel.create(new_fuel));
+
+      if (err) {
+        Handlers.dbErrorHandler(res, err);
+        return;
       }
+
+      Handlers.onSuccess(res, fuel);
     }
   }
 

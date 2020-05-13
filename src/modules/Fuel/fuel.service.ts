@@ -1,4 +1,4 @@
-import { IFuel, createFuels, create } from './fuel.module';
+import { IFuel, createFuels, create, IFuelDetail } from './fuel.module';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
 const model = require('../../entities');
@@ -6,12 +6,15 @@ const model = require('../../entities');
 class Fuel {
   constructor() {}
 
-  create(fuel: any): Promise<any>{
-    if (fuel.name) {
-      return model.Fuel.create(fuel);
-    } else {
-      throw new Error('Name of fuel is required').message;
+  public async create(fuel: any): Promise<IFuel>{
+
+    const [err, success] = await to<any>(model.Fuel.create(fuel));
+
+    if (err) {
+      throw err;
     }
+
+    return (create(success));
   }
   
   public async getAll(): Bluebird<IFuel[]>{
