@@ -1,3 +1,5 @@
+import * as crypto from 'crypto'
+
 export const to = <T>(promise: Promise<T>): Promise<[Error | undefined, T]> =>
   promise
     .then<[undefined, T]>((res: T) => [undefined, res])
@@ -10,4 +12,19 @@ export function findWithAttr(array: any[], attr: string, value: any): number {
     }
   }
   return -1;
+}
+
+export async function generateRadomToken(): Promise<string> {
+  let token: string;
+
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(20, (err, buffer) => {
+      if (err) {
+        reject(err)
+        return;
+      }
+
+      resolve(buffer.toString('hex'))
+    });
+  });
 }

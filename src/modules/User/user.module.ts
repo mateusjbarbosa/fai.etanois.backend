@@ -1,8 +1,4 @@
-import * as crypto from 'crypto'
-import Redis from '../../core/redis/redis';
-import Nodemailer from '../../core/nodemailer/nodemailer';
 import { IFuelDetail } from '../Fuel/fuel.module';
-import userPreferenceFuel from '../../entities/user-preference-fuel';
 
 export enum EUserRoles {
   ADMIN = 'admin',
@@ -136,24 +132,4 @@ export function getUserForAuthorization(user: any): IUserForAuthorization {
 
 export function createUsers(data: any[]): IUserDetail[] {
   return data.map(create);
-}
-
-export async function generateRandomToken(user: any): Promise<any> {
-  if (user) {
-    const { id, email } = user;
-
-    return new Promise((resolve, reject) => {
-      crypto.randomBytes(20, (err, buffer) => {
-        const token = buffer.toString('hex')
-        const redis = new Redis();
-  
-        redis.createRecoverPassword(token, id)
-        Nodemailer.sendEmailRecoverPassword(email, token)
-        .then(message => { resolve({msg: ['Email sent']}) })
-        .catch (err => { reject('It was not possible to send the email') });
-      });
-    })
-  } else {
-    throw new Error('User not found').message;
-  }
 }

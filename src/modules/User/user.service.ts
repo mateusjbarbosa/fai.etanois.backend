@@ -1,5 +1,5 @@
 import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
-  generateRandomToken, IUserForAuthorization} from './user.module';
+  IUserForAuthorization} from './user.module';
 import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
@@ -104,19 +104,24 @@ class User {
     });
   }
 
-  public forgotPassword(email: string, username: string) {
+  public async readByEmailOrUsername(email: string, username: string): Promise<IUserDetail> {
     const query = this.generateQueryByCredential(email, username);
 
-    return new Promise((resolve, reject) => {
-      model.User.findOne({
-        where: {
-          [Op.and]: [query]
-        }
-      })
-      .then(generateRandomToken)
-      .then(msg => {resolve(msg)})
-      .catch(err => {reject(err)});
-    });
+    const [err, success] = await to<any>(model.User.findOne({
+      where: {
+        [Op.and]: [query]
+      }
+    }));
+
+    if (err) {
+      throw (err);
+    }
+
+    if (success) {
+      return (create(success));
+    } else {
+      throw {errors: [{message: 'User not found'}]};
+    }
   }
 
   public recoveryPassword(token: string) {

@@ -18,8 +18,8 @@ class Redis {
     })
   }
 
-  public createRecoverPassword(token: string, userId: string): void {
-    this.client.set(token, userId, () => {})
+  public createRecoverPassword(token: string, user_id: string): void {
+    this.client.set(token, user_id, () => {})
     this.client.expire(token, (60), () => {})
   }
 

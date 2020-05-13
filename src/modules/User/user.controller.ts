@@ -1,16 +1,18 @@
 import { Request, Response} from 'express';
 import * as _ from 'lodash';
+import * as bcrypt from 'bcrypt';
 import User from './user.service';
 import FuelPreference from './fuel-preference.service';
 import Handlers from '../../core/handlers/response-handlers';
 import Nodemailer from '../../core/nodemailer/nodemailer';
 import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
-import { to, findWithAttr } from '../../core/util/util';
-import Authenticate from '../Auth/authenticate.service'
+import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
 import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
-import Fuel from '../Fuel/fuel.service';
 import { IUserPreferenceFuel } from './fuel-preference.module';
-import * as bcrypt from 'bcrypt';
+import Redis from '../../core/redis/redis';
+import Authenticate from '../Auth/authenticate.service'
+import Fuel from '../Fuel/fuel.service';
+
 
 class UserController {
   constructor() {}
@@ -206,13 +208,36 @@ class UserController {
     }
   }
 
-  public forgotPassword = (req: Request, res: Response) => {
+  public forgotPassword = async (req: Request, res: Response) => {
     const {username, email} = req.body;
 
     if (username || email) {
-      User.forgotPassword(email, username)
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(err => { Handlers.onError(res, err) });
+      const [err, user] = await to<IUserDetail>(User.readByEmailOrUsername(email, username));
+      
+      if (err) {
+        Handlers.dbErrorHandler(res, err)
+        return;
+      }
+
+      const redis = new Redis();
+      const [err_token, token] = await to<string>(generateRadomToken());
+  
+      if (err_token) {
+        Handlers.onError(res, 'It was not possible to generate the token');
+        return;
+      }
+
+      redis.createRecoverPassword(token, user.id.toString());
+  
+      const [err_email, success_email] = 
+      await to<any>(Nodemailer.sendEmailRecoverPassword(user.email, token));
+    
+      if (err_email) {
+        Handlers.onError(res, 'It was not possible to send the email');
+        return;
+      }
+
+      Handlers.onSuccess(res, 'E-mail sent');
     } else {
       Handlers.onError(res, 'E-mail/Phone number and password are required');
     }
@@ -233,7 +258,6 @@ class UserController {
       await to<IUserForAuthorization>(Authenticate.getJwtPayload(req.params.token));
 
     if (errToken) {
-      console.log(errToken)
       Handlers.onError(res, 'Invalid token');
       return;
     }
