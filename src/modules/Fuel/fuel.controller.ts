@@ -36,15 +36,30 @@ class FuelController {
     Handlers.onSuccess(res, fuels);
   }
 
-  public update = (req: Request, res: Response) => {
-    const oldFuelName: string = req.params.name;
-    const newFuelName: string = req.body;
+  public update = async (req: Request, res: Response) => {
+    const old_fuel: IFuel = {name: req.params.name};
+    const new_fuel: IFuel = {name: req.body.name};
 
     if (Authenticate.verifyUserType(req, res, req.user['role'], 0, req.user['id'])) {
-      Fuel.update(oldFuelName, newFuelName)
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.dbErrorHandler, res))
-      .catch(_.partial(Handlers.onError, res, 'Error updating fuel'));
+      const [err_db, old_fuel_db] = await to<IFuel>(Fuel.findByName(old_fuel.name));
+
+      if (!old_fuel_db) {
+        if (err_db) {
+          Handlers.dbErrorHandler(res, err_db);
+        } else {
+          Handlers.onError(res, 'Fuel not found');
+        }
+        return;
+      }
+
+      const [err, fuel] = await to<IFuel>(Fuel.update(old_fuel_db, new_fuel));
+
+      if (err) {
+        Handlers.dbErrorHandler(res, err);
+        return;
+      }
+
+      this.readAll(req, res);
     }
   }
 

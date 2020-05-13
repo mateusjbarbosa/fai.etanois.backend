@@ -1,6 +1,7 @@
 import { IFuel, createFuels, create, IFuelDetail } from './fuel.module';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
+import e = require('express');
 const model = require('../../entities');
 
 class Fuel {
@@ -29,14 +30,31 @@ class Fuel {
     return createFuels(success);
   }
 
-  update(oldName: string, newName: string){
-    return model.Fuel.update(newName, {
-      where: {name: oldName},
+  public async findByName(fuel_name: string): Promise<IFuel>{
+    const [err, success] = await to<any>(model.Fuel.findOne( {
+      where: {name: fuel_name}
+    }));
+
+    if (err) {
+      throw err
+    }
+
+    return (create(success));
+  }
+
+  public async update(old_fuel: IFuel, new_fuel: IFuel): Promise<IFuel>{
+    const [err, success] = await to<any>(model.Fuel.update(new_fuel, {
+      where: {name: old_fuel.name},
       fields: [ 'name' ],
       hooks: true,
       individualHooks: true
-    })
-    .then(create);
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return(create(success));
   }
 
   delete(name: string){

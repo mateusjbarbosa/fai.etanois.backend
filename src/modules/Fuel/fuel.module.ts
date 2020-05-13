@@ -1,6 +1,6 @@
 export interface IFuel {
   name: string
-  id: number
+  id?: number
 }
 
 export interface IFuelDetail {
