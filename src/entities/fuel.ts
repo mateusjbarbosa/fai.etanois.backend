@@ -7,6 +7,7 @@ export default function (sequelize, DataTypes) {
     },
     name: {
       type: DataTypes.STRING(50),
+      allowNull: false,
       unique: {
         args: true,
         msg: 'The fuel name already exists',
@@ -15,6 +16,13 @@ export default function (sequelize, DataTypes) {
         len: {
           args: [5, 50],
           msg: 'Fuel name is too short or too large'
+        },
+        notEmpty: {
+          args: true,
+          msg: 'Name can\'t be empty'
+        },
+        notNull: {
+          msg: 'Name is required'
         }
       }
     }

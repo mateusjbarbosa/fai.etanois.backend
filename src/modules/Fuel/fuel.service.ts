@@ -1,17 +1,21 @@
-import { IFuel, createFuels, create } from './fuel.module';
+import { IFuel, createFuels, create, IFuelDetail } from './fuel.module';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
+import e = require('express');
 const model = require('../../entities');
 
 class Fuel {
   constructor() {}
 
-  create(fuel: any): Promise<any>{
-    if (fuel.name) {
-      return model.Fuel.create(fuel);
-    } else {
-      throw new Error('Name of fuel is required').message;
+  public async create(fuel: any): Promise<IFuel>{
+
+    const [err, success] = await to<any>(model.Fuel.create(fuel));
+
+    if (err) {
+      throw err;
     }
+
+    return (create(success));
   }
   
   public async getAll(): Bluebird<IFuel[]>{
@@ -26,20 +30,41 @@ class Fuel {
     return createFuels(success);
   }
 
-  update(oldName: string, newName: string){
-    return model.Fuel.update(newName, {
-      where: {name: oldName},
+  public async findByName(fuel_name: string): Promise<IFuel>{
+    const [err, success] = await to<any>(model.Fuel.findOne( {
+      where: {name: fuel_name}
+    }));
+
+    if (err) {
+      throw err
+    }
+
+    return (create(success));
+  }
+
+  public async update(old_fuel: IFuel, new_fuel: IFuel): Promise<IFuel>{
+    const [err, success] = await to<any>(model.Fuel.update(new_fuel, {
+      where: {name: old_fuel.name},
       fields: [ 'name' ],
       hooks: true,
       individualHooks: true
-    })
-    .then(create);
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return(create(success));
   }
 
-  delete(name: string){
-    return model.Fuel.destroy({
+  public async delete(name: string): Promise<void>{
+    const [err, success] = await to<any>(model.Fuel.destroy({
       where: {name}
-    });
+    }));
+
+    if (err) {
+      throw err;
+    }
   }
 }
 
