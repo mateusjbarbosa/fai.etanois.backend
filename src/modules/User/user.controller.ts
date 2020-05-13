@@ -174,13 +174,15 @@ class UserController {
         const [err_create_preference_fuel, success_create_preference_fuel] = 
           await to<IFuelDetail[]>(this.createFuelPreference(
             user['user_preference_fuels'], user_id, errors));
-        }
-        
-        const [err_fuel_preference, success_fuel_preference] = 
+
+            success['user_preference_fuels'] = success_create_preference_fuel;
+        } else {
+          const [err_fuel_preference, success_fuel_preference] = 
           await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
 
         if (!err_fuel_preference) {
           success['user_preference_fuels'] = success_fuel_preference;
+        } 
         }
 
         Handlers.onSuccess(res, {user: success, msg: errors});
