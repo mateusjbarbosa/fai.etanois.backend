@@ -10,9 +10,14 @@ class User {
 
   constructor() {}
 
-  public create(user: IUserDetail): Promise<IUserDetail> {
-    return model.User.create(user)
-    .then(create);
+  public async create(user: IUserDetail): Promise<IUserDetail> {
+    const [err, success] = await to<any>(model.User.create(user));
+
+    if (err) {
+      throw err
+    }
+
+    return create(success);
   }
   
   public getAll(): Bluebird<IUserDetail[]>{

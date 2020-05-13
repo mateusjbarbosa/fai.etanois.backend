@@ -18,12 +18,13 @@ class UserController {
   public create = async(req: Request, res: Response) => {
     const body = req.body
     let errors: string[] = [];
-    const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
 
     body['etacoins'] = 0;
 
+    const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
+
     if (errCreateUser) {
-      Handlers.onError(res, errCreateUser.message);
+      Handlers.dbErrorHandler(res, errCreateUser);
       return;
     }
 
