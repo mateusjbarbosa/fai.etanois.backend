@@ -25,7 +25,7 @@ export class AuthRouterModule extends BaseRouterModule {
 
     if ((email || username) && password) {
       try {
-        const user = await User.getUserForAuthorization(email, username);
+        const user = await User.getUserForAuthorization(email, username, null);
         ResponseHandlers.authSuccess(res, password, user);
       } catch(error) {
         ResponseHandlers.authFail(req, res);

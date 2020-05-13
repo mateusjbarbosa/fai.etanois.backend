@@ -194,13 +194,13 @@ class UserController {
 
   public delete = (req: Request, res: Response) => {
     const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
-    const userId = parseInt(req.params.id);
+    const user_id = parseInt(req.params.id);
     
     if (Authenticate.authorized(req, res, req.user, allowedRoles))
     {
-      if (Authenticate.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
+      if (Authenticate.verifyUserType(req, res, req.user['role'], user_id, req.user['id']))
       {
-        User.delete(userId)
+        User.delete(user_id)
         .then(_.partial(Handlers.onSuccess, res))
         .catch(_.partial(Handlers.onError, res, 'Error deleting user'));
       }
@@ -242,14 +242,26 @@ class UserController {
     }
   }
 
-  public recovryPassword = (req: Request, res: Response) => {
+  public recovryPassword = async (req: Request, res: Response) => {
     const token = req.params.token;
+    const redis = new Redis();
 
-    User.recoveryPassword(token)
-    .then(data => {
-      Handlers.sendToken(res, data);
-    })
-    .catch(_.partial(Handlers.onError, res, 'Invalid token'));
+    const [err_redis, id_user] = await to<string>(redis.verifyExistenceToken(token));
+
+    if (err_redis || !id_user) {
+      Handlers.onError(res, 'Invalid token');
+      return;
+    }
+
+    const [err_db, user] = 
+      await to<IUserForAuthorization>(User.getUserForAuthorization(null, null, Number(id_user)))
+    
+    if (err_db) {
+      Handlers.onError(res, 'Invalid token');
+      return;
+    }
+
+    Handlers.sendToken(res, user);
   }
 
   public activateAccout = async (req: Request, res: Response) => {

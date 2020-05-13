@@ -51,9 +51,9 @@ class User {
     return create(success);
   }
 
-  public async getUserForAuthorization(email: string, username: string): 
+  public async getUserForAuthorization(email: string, username: string, id: number): 
     Promise<IUserForAuthorization> {
-    const query = this.generateQueryByCredential(email, username);
+    const query = this.generateQueryByCredential(email, username, id);
     
     const [err, success] = await to<any>(model.User.findOne({
       where: {
@@ -105,7 +105,7 @@ class User {
   }
 
   public async readByEmailOrUsername(email: string, username: string): Promise<IUserDetail> {
-    const query = this.generateQueryByCredential(email, username);
+    const query = this.generateQueryByCredential(email, username, null);
 
     const [err, success] = await to<any>(model.User.findOne({
       where: {
@@ -122,25 +122,6 @@ class User {
     } else {
       throw {errors: [{message: 'User not found'}]};
     }
-  }
-
-  public recoveryPassword(token: string) {
-    const redis = new Redis();
-    let query = {};
-
-    return redis.verifyExistenceToken(token).then(id => {
-      if (id) {
-        query['id'] = id;
-        query['activate'] = true;
-
-        return model.User.findOne({
-          where: {
-            [Op.and]: [query]
-          }
-        })
-        .then(getUserForAuthorization);
-      }
-    });
   }
 
   public async activateAccount(user: IUserForAuthorization): Promise<IUserDetail> {
@@ -176,7 +157,7 @@ class User {
       return create(success);
   }
 
-  private generateQueryByCredential(email: string, username: string): object {
+  private generateQueryByCredential(email: string, username: string, id: number): object {
     let query = {};
 
     if (email) {
@@ -185,6 +166,10 @@ class User {
 
     if (username) {
       query['username'] = username
+    }
+
+    if (id) {
+      query['id'] = id;
     }
 
     query['activate'] = true;

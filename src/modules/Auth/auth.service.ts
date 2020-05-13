@@ -14,7 +14,7 @@ class AuthService {
 
     passport.use(new Strategy(opts, async(jwtPayload, done) => {
       const [err, user] =  await to<IUserForAuthorization>(User.getUserForAuthorization(
-        jwtPayload.email, jwtPayload.username));
+        jwtPayload.email, jwtPayload.username, null));
 
       if (err) {
         return (done(err, null));
