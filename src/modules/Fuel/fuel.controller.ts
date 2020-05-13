@@ -63,13 +63,18 @@ class FuelController {
     }
   }
 
-  public delete = (req: Request, res: Response) => {
-    const fuelName: string = req.params.name;
+  public delete = async (req: Request, res: Response) => {
+    const fuel_name: string = req.params.name;
 
     if (Authenticate.verifyUserType(req, res, req.user['role'], 0, req.user['id'])) {
-      Fuel.delete(fuelName)
-      .then(_.partial(Handlers.onSuccess, res))
-      .catch(_.partial(Handlers.onError, res, 'Error deleting fuel'));
+      const [err, success] = await to<void>(Fuel.delete(fuel_name));
+
+      if (err) {
+        Handlers.dbErrorHandler(res, err);
+        return;
+      }
+      
+      this.readAll(req, res);
     }
   }
 }

@@ -57,10 +57,14 @@ class Fuel {
     return(create(success));
   }
 
-  delete(name: string){
-    return model.Fuel.destroy({
+  public async delete(name: string): Promise<void>{
+    const [err, success] = await to<any>(model.Fuel.destroy({
       where: {name}
-    });
+    }));
+
+    if (err) {
+      throw err;
+    }
   }
 }
 
