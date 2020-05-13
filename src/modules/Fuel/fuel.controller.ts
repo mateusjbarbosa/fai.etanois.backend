@@ -25,10 +25,15 @@ class FuelController {
     }
   }
 
-  public readAll = (req: Request, res: Response) => { 
-    Fuel.getAll()
-    .then(_.partial(Handlers.onSuccess, res))
-    .catch(_.partial(Handlers.onError, res, 'Error fetching all fuels'));
+  public readAll = async (req: Request, res: Response) => { 
+    const [err_db, fuels] = await to<IFuel[]>(Fuel.getAll());
+    
+    if (err_db) {
+      Handlers.dbErrorHandler(res, err_db);
+      return;
+    }
+
+    Handlers.onSuccess(res, fuels);
   }
 
   public update = (req: Request, res: Response) => {
