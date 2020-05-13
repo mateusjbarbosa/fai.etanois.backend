@@ -12,6 +12,9 @@ export default function (sequelize, DataTypes) {
         notEmpty: {
           args: true,
           msg: 'Fuel name cannot be empy'
+        },
+        notNull: {
+          msg: 'Fuel ID is required'
         }
       },
       unique: 'userPreference'
@@ -23,6 +26,9 @@ export default function (sequelize, DataTypes) {
         notEmpty: {
           args: true,
           msg: 'User ID cannot be empy'
+        },
+        notNull: {
+          msg: 'User ID is required'
         }
       },
       unique: 'userPreference'

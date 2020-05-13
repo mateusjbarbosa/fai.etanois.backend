@@ -192,19 +192,25 @@ class UserController {
     }
   }
 
-  public delete = (req: Request, res: Response) => {
-    const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
-    const user_id = parseInt(req.params.id);
-    
-    if (Authenticate.authorized(req, res, req.user, allowedRoles))
-    {
-      if (Authenticate.verifyUserType(req, res, req.user['role'], user_id, req.user['id']))
+  public delete = async (req: Request, res: Response) => {
+    new Promise(async (resolve) => {
+      const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
+      const user_id = parseInt(req.params.id);
+
+      if (Authenticate.authorized(req, res, req.user, allowedRoles))
       {
-        User.delete(user_id)
-        .then(_.partial(Handlers.onSuccess, res))
-        .catch(_.partial(Handlers.onError, res, 'Error deleting user'));
+        if (Authenticate.verifyUserType(req, res, req.user['role'], user_id, req.user['id']))
+        {
+          const [err, user] = await to<IUserDetail>(User.delete(user_id));
+          
+          if (err) {
+            resolve(Handlers.dbErrorHandler(res, err));
+          }
+
+          resolve(Handlers.onSuccess(res, user));
+        }
       }
-    }
+    });
   }
 
   public forgotPassword = async (req: Request, res: Response) => {

@@ -90,18 +90,24 @@ class User {
     return create(success);
   }
 
-  public delete(id: number){
+  public async delete(id: number): Promise<IUserDetail>{
     const user = {
       id: id,
       activate: false
     }
 
-    return model.User.update(user, {
+    const[err, success] = await to<any>(model.User.update(user, {
       where: {id},
       fields: ['activate'],
       hooks: true,
       individualHooks: true
-    });
+    }));
+
+    if (err) {
+      throw err
+    }
+
+    return (create(success));
   }
 
   public async readByEmailOrUsername(email: string, username: string): Promise<IUserDetail> {
