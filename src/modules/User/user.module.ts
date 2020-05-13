@@ -149,7 +149,7 @@ export async function generateRandomToken(user: any): Promise<any> {
   
         redis.createRecoverPassword(token, id)
         Nodemailer.sendEmailRecoverPassword(email, token)
-        .then(message => { resolve({msg: 'Email sent'}) })
+        .then(message => { resolve({msg: ['Email sent']}) })
         .catch (err => { reject('It was not possible to send the email') });
       });
     })
