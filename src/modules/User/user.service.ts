@@ -1,5 +1,8 @@
-import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, IUserForAuthorization } from './user.module';
+import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
+  IUserForAuthorization} from './user.module';
+import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
+import { to } from '../../core/util/util';
 const model = require('../../entities');
 const { Op } = require("sequelize");
 
@@ -7,60 +10,171 @@ class User {
 
   constructor() {}
 
-  create(user: any): Promise<any>{
-    if (user.phone_number || user.email) {
-      return model.User.create(user);
-    } else {
-      throw new Error('Phone number or email is required').message;
+  public async create(user: IUserDetail): Promise<IUserDetail> {
+    const [err, success] = await to<any>(model.User.create(user));
+
+    if (err) {
+      throw err
     }
+
+    return create(success);
   }
   
-  getAll(): Bluebird<IUserDetail[]>{
+  public getAll(): Bluebird<IUserDetail[]>{
     return model.User.findAll({
-      order: ['name']
+      order: ['name'],
+      include: [{
+        model: model.UserPreferenceFuel}]
     })
     .then(createUsers);
   }
   
-  getById(id: number): Bluebird<IUserDetail>{
-    return model.User.findOne({
-      where: {id}
-    })
-    .then(create);
+  public async getById(id: number): Bluebird<IUserDetail>{
+    let query = {};
+
+    query['id'] = id;
+    query['activate'] = true;
+
+    const [err, success] = await to<any>(model.User.findOne({
+      where: {
+        [Op.and]: [query]
+      },
+      include: [
+        { model: model.UserPreferenceFuel,
+          include: { model: model.Fuel } }],
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return create(success);
   }
 
-  getUserForAuthorization(email: string, phone_number: string) {
+  public async getUserForAuthorization(email: string, username: string, id: number): 
+    Promise<IUserForAuthorization> {
+    const query = this.generateQueryByCredential(email, username, id);
+    
+    const [err, success] = await to<any>(model.User.findOne({
+      where: {
+        [Op.and]: [query]
+      }
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return (getUserForAuthorization(success));
+  }
+
+  public async update(id: number, user: any, fields: string[]): Promise<IUserDetail>{
+    let query = {};
+  
+    query['id'] = id;
+    query['activate'] = true;
+
+    const [err, success] = await to<any>(model.User.update(user, {
+      where: {
+        [Op.and]: [query]
+      },
+      fields: fields,
+      hooks: true,
+      individualHooks: true
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    return create(success);
+  }
+
+  public delete(id: number){
+    const user = {
+      id: id,
+      activate: false
+    }
+
+    return model.User.update(user, {
+      where: {id},
+      fields: ['activate'],
+      hooks: true,
+      individualHooks: true
+    });
+  }
+
+  public async readByEmailOrUsername(email: string, username: string): Promise<IUserDetail> {
+    const query = this.generateQueryByCredential(email, username, null);
+
+    const [err, success] = await to<any>(model.User.findOne({
+      where: {
+        [Op.and]: [query]
+      }
+    }));
+
+    if (err) {
+      throw (err);
+    }
+
+    if (success) {
+      return (create(success));
+    } else {
+      throw {errors: [{message: 'User not found'}]};
+    }
+  }
+
+  public async activateAccount(user: IUserForAuthorization): Promise<IUserDetail> {
+    const keys = Object.keys(user)
+
+    let query = {}
+  
+    user['activate'] = true;
+    keys.forEach(property => {
+      switch(property) {
+        case 'email':
+        case 'username':
+            query[property] = user[property];
+        break;
+      }
+    });
+
+    query['activate'] = false;
+
+    const [err, success] = await to<any>(model.User.update(user, {
+        where: {
+          [Op.and]: [query]
+        },
+        fields: ['activate'],
+        hooks: true,
+        individualHooks: true
+      }));
+    
+      if (err) {
+        throw new Error()  
+      }
+      
+      return create(success);
+  }
+
+  private generateQueryByCredential(email: string, username: string, id: number): object {
     let query = {};
 
     if (email) {
       query['email'] = email;
     }
 
-    if (phone_number) {
-      query['phone_number'] = phone_number
+    if (username) {
+      query['username'] = username
     }
-    
-    return model.User.findOne({
-      where: {
-        [Op.and]: [query]
-      }
-    })
-    .then(getUserForAuthorization);
-  }
 
-  update(id: number, user: any){
-    return model.User.update(user, {
-      where: {id},
-      fields: ['name', 'email', 'phone_number', 'password', 'payment_mode'],
-      hooks: true,
-      individualHooks: true
-    });
-  }
+    if (id) {
+      query['id'] = id;
+    }
 
-  delete(id: number){
-    return model.User.destroy({
-      where: {id}
-    });
+    query['activate'] = true;
+
+    return query
   }
 }
 

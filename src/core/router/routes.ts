@@ -46,7 +46,7 @@ export class RouterModule {
           ? this.express.route(endpoint).all(authenticate())[resgistredVeb](callback)
           : this.express.route(endpoint)[resgistredVeb](callback);
 
-        console.log(`${resgistredVeb}: ${endpoint}`);
+        console.log(`${resgistredVeb}: ${endpoint} | isProtected: ${isProtected}`);
       }
   }
 }

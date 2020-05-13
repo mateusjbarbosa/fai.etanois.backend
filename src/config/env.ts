@@ -6,10 +6,16 @@ export interface IDatabaseEnvorimmet {
   dialect: string;
 }
 
+export interface IRedisEnvoriment {
+  port: number,
+  host: string
+}
+
 export interface IEnvorimment {
   envorimmentName: string;
   serverPort: string;
   database: IDatabaseEnvorimmet;
+  redis: IRedisEnvoriment
   secret: string
 }
 
@@ -24,6 +30,10 @@ export class Envorimment {
       host: "127.0.0.1",
       dialect: "postgres",
     },
+    redis: {
+      port: 6379,
+      host: '127.0.0.1'
+    },
     serverPort: "80",
     secret: 'S3CR3T'
   },{
@@ -35,19 +45,27 @@ export class Envorimment {
       host: "127.0.0.1",
       dialect: "postgres",
     },
+    redis: {
+      port: 6379,
+      host: '127.0.0.1'
+    },
     serverPort: "80",
     secret: 'S3CR3T'
   }, {
     envorimmentName: "production",
     database: {
-      username: "postgres",
-      password: "postgres",
+      username: process.env.DATABASE_USERNAME || "postgres",
+      password: process.env.DATABASE_PASSWORD || "postgres",
       database: "etanois",
-      host: "postgres",
+      host: process.env.DATABASE_HOST || "postgres",
       dialect: "postgres"
     },
-    serverPort: "3000",
-    secret: "S3CR3T"
+    redis: {
+      port: 6379,
+      host: 'redis'
+    },
+    serverPort: process.env.DATABASE_SERVER_PORT || "3000",
+    secret: process.env.DATABASE_SECRET || "S3CR3T"
   }];
   
   private envorimment: string

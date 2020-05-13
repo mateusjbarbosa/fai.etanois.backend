@@ -5,6 +5,9 @@ import { IUser, EUserRoles, EPaymentMode } from './user.module';
 export class UserTest {
   constructor() {}
 
+  private propetyExpected: string[] = ['email', 'id', 'name', 'cep', 'payment_mode', 'username',
+  'search_distance_with_route', 'search_distance_without_route', 'etacoins', 'UserPreferenceFuels'];
+
   public runTests(): void {
     describe('Unit Test: User', () => {
       'use strict';
@@ -14,8 +17,10 @@ export class UserTest {
         name: 'Default User',
         email: 'defaultuser@email.com',
         password: '1234',
-        phone_number: '35984552145',
+        username: 'userDefault',
         cep: '37540000',
+        search_distance_with_route: 1000,
+        search_distance_without_route: 2000,
         payment_mode: EPaymentMode.BOTH,
         role: EUserRoles.ADMIN
       };
@@ -41,18 +46,15 @@ export class UserTest {
             id: 2,
             name: 'Novo Usuário',
             email: 'novousuario@email.com',
+            username: 'newUser',
             password: '1234',
             cep: '37548000',
+            search_distance_with_route: 100,
+            search_distance_without_route: 200,
             payment_mode: EPaymentMode.CREDIT_CARD,
           };
     
-          return User.create(newUser)
-          .then(data => {
-            expect(data.dataValues).to.have.all.keys(
-              ['email', 'id', 'name', 'password', 'phone_number', 'cep', 'payment_mode', 'role',
-              'updatedAt', 'createdAt']
-            );
-          })
+          return User.create(newUser);
         });
       });
     
@@ -63,8 +65,10 @@ export class UserTest {
             email: 'atualizado@email.com'
           }
     
-          return User.update(defaultUser.id, userUpdate).then(data => {
-            expect(data[0]).to.be.equal(1);
+          return User.update(defaultUser.id, userUpdate, EUserRoles.ADMIN).then(data => {
+            expect(data).to.have.all.keys(
+              this.propetyExpected
+            );
           })
         });
       });
@@ -81,7 +85,7 @@ export class UserTest {
         it('Deve retornar um usuário de acordo com o id passado', () => {
           return User.getById(defaultUser.id).then(data => {
             expect(data).to.have.all.keys(
-              ['email', 'id', 'name', 'cep', 'payment_mode', 'phone_number']
+              this.propetyExpected
             );
           });
         });

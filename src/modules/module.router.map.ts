@@ -1,5 +1,6 @@
 import { UserRouterModule } from "./User/user.router";
 import { AuthRouterModule } from "./Auth/auth.router";
+import { FuelRouterModule } from "./Fuel/fuel.router";
 
 export interface FeatureModuleRouter {
   moduleName: any;
@@ -14,6 +15,10 @@ export class ModulesRouterMapper {
     },
     {
       moduleName: AuthRouterModule,
+      parser: 'getRoutesFromModules'
+    },
+    {
+      moduleName: FuelRouterModule,
       parser: 'getRoutesFromModules'
     }
   ];

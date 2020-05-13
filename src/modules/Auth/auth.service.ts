@@ -2,6 +2,8 @@ import * as passport from 'passport';
 import { Strategy, ExtractJwt} from 'passport-jwt';
 import User from '../User/user.service'
 import Configuration from '../../config/config';
+import { to } from '../../core/util/util';
+import { IUserForAuthorization } from '../User/user.module';
 
 class AuthService {
   config() {
@@ -10,22 +12,24 @@ class AuthService {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
     };
 
-    passport.use(new Strategy(opts, (jwtPayload, done) => {
-      User.getUserForAuthorization(jwtPayload.email, jwtPayload.phone_number).then(user => {
-        if (user && (user.password == jwtPayload.password) && (user.id == jwtPayload.id)) {
-          return done(null, {
-            id: user.id,
-            phone_number: user.phone_number,
-            email: user.email,
-            role: user.role
-          });
-        }
-  
-        return done(null, false);
-      })
-      .catch(error => {
-        done(error, null);
-      });
+    passport.use(new Strategy(opts, async(jwtPayload, done) => {
+      const [err, user] =  await to<IUserForAuthorization>(User.getUserForAuthorization(
+        jwtPayload.email, jwtPayload.username, null));
+
+      if (err) {
+        return (done(err, null));
+      }
+
+      if (user && (user.password == jwtPayload.password) && (user.id == jwtPayload.id)) {
+        return done(null, {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        });
+      }
+
+      return done(null, false);
     }));
   
     return {

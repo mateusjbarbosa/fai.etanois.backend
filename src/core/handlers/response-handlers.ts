@@ -1,8 +1,7 @@
 import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
+import Authenticate from '../../modules/Auth/authenticate.service';
 import * as HttpStatus from 'http-status';
-import * as jwt from 'jwt-simple';
 import * as bcrypt from 'bcrypt';
-import Configuration from '../../config/config';
 
 class Handlers {
   authFail(req: Request, res: Response) {
@@ -11,24 +10,18 @@ class Handlers {
 
   authSuccess(res: Response, password: any, data: any) {
     const isMatch = bcrypt.compareSync(password, data.password);
-  
-    if (isMatch) {
-      const payload = {id: data.id, password: data.password, email: data.email,
-        phone_number: data.phone_number};
 
-      res.status(HttpStatus.OK).json({
-        token: jwt.encode(payload, Configuration.secret)
-      });
+    if (isMatch) {
+      this.sendToken(res, data)
     } else {
       res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
   }
 
-  onError(res: Response, menssage: string) {
-    res.status(HttpStatus.PRECONDITION_FAILED).json({ 
-      code: 'ERR-03',
-      menssage: [menssage]
-    });
+  sendToken(res: Response, user: any) {
+    const token = Authenticate.getToken(user);
+
+    res.status(HttpStatus.OK).json({ token: token });
   }
 
   onSuccess(res: Response, data: any) {
@@ -39,13 +32,12 @@ class Handlers {
     console.log(`API error handler was executed: ${err}`);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       code: 'ERR-001',
-      message: ['Internal error']
+      msg: ['Internal error']
     });
   }
 
   dbErrorHandler(res: Response, err: any) {
     let errors: string[] = new Array();
-    console.log(`Db error: ${err}`)
 
     if (err.errors) {
       err.errors.forEach(element => {
@@ -57,7 +49,14 @@ class Handlers {
 
     res.status(HttpStatus.PRECONDITION_FAILED).json({
       code: 'ERR-002',
-      menssage: errors
+      msg: errors
+    });
+  }
+
+  onError(res: Response, menssage: string) {
+    res.status(HttpStatus.PRECONDITION_FAILED).json({ 
+      code: 'ERR-03',
+      msg: [menssage]
     });
   }
 }
