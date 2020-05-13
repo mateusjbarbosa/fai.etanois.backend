@@ -86,23 +86,26 @@ class UserController {
   }
 
   public readOnly = async(req: Request, res: Response) => {
-    const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
-    const userId = parseInt(req.params.id);
-    
-    if (Authenticate.authorized(req, res, req.user, allowedRoles))
-    { 
-      if (Authenticate.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
-      {
-        const [err, success] = await to<IUserDetail>(User.getById(userId));
-        
-        if (err) {
-          Handlers.onError(res, 'User not found');
-          return;
+    return new Promise(async resolve => {
+      const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
+      const userId = parseInt(req.params.id);
+      
+      if (Authenticate.authorized(req, res, req.user, allowedRoles))
+      { 
+        if (Authenticate.verifyUserType(req, res, req.user['role'], userId, req.user['id']))
+        {
+          const [err, success] = await to<IUserDetail>(User.getById(userId));
+          
+          if (err) {
+            Handlers.onError(res, 'User not found');
+            resolve();
+          }
+  
+          Handlers.onSuccess(res, success);
+          resolve();
         }
-
-        Handlers.onSuccess(res, success);
       }
-    }
+    });
   }
 
   public readAll = (req: Request, res: Response) => {
@@ -117,129 +120,144 @@ class UserController {
   }
 
   public update = async (req: Request, res: Response) => {
-    const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
-    const user_id = parseInt(req.params.id);
-    const user = req.body;
-    const role = req.user['role'];
-    const errors: string[] = [];
-    let update_fuel_preference: boolean = false;
-    
-    if (Authenticate.authorized(req, res, req.user, allowedRoles))
-    {
-      if (Authenticate.verifyUserType(req, res, role, user_id, req.user['id']))
+    return new Promise(async resolve => {
+      const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
+      const user_id = parseInt(req.params.id);
+      const user = req.body;
+      const role = req.user['role'];
+      const errors: string[] = [];
+      let update_fuel_preference: boolean = false;
+      
+      if (Authenticate.authorized(req, res, req.user, allowedRoles))
       {
-        const keys = Object.keys(user);
-        let fields: string[] = [];
+        if (Authenticate.verifyUserType(req, res, role, user_id, req.user['id']))
+        {
+          const keys = Object.keys(user);
+          let fields: string[] = [];
 
-        keys.forEach(async property => {
-          switch (property)
-          {
-            case 'email':
-            case 'id':
-            case 'name':
-            case 'search_distance_with_route':
-            case 'search_distance_without_route':
-            case 'payment_mode':
-              fields.push(property);
-            break;
-    
-            case 'password':
-              const salt = bcrypt.genSaltSync(10);
-              
-              user.password = bcrypt.hashSync(user.password, salt)
-              fields.push(property);
-            break;
-    
-            case 'etacoins':
-              if (role == EUserRoles.ADMIN) {
+          keys.forEach(async property => {
+            switch (property)
+            {
+              case 'email':
+              case 'id':
+              case 'name':
+              case 'search_distance_with_route':
+              case 'search_distance_without_route':
+              case 'payment_mode':
                 fields.push(property);
-              }
-            break;
+              break;
+      
+              case 'password':
+                const salt = bcrypt.genSaltSync(10);
+                
+                user.password = bcrypt.hashSync(user.password, salt)
+                fields.push(property);
+              break;
+      
+              case 'etacoins':
+                if (role == EUserRoles.ADMIN) {
+                  fields.push(property);
+                }
+              break;
 
-            case 'user_preference_fuels':
-              update_fuel_preference = true;
-            break;
+              case 'user_preference_fuels':
+                update_fuel_preference = true;
+              break;
+            }
+          });
+
+          const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
+
+          if (err) {
+            Handlers.dbErrorHandler(res, err);
+            resolve();
           }
-        });
 
-        const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
+          if (update_fuel_preference) {
+            const [err_delete_fuel_pref, success_delete_fuel_pref] = 
+            await to<any>(FuelPreference.deleteByUser(user_id));
 
-        if (err) {
-          Handlers.dbErrorHandler(res, err);
-          return;
+            const [err_create_preference_fuel, success_create_preference_fuel] = 
+              await to<IFuelDetail[]>(this.createFuelPreference(
+                user['user_preference_fuels'], user_id, errors));
+
+            success['user_preference_fuels'] = success_create_preference_fuel;
+          } else {
+            const [err_fuel_preference, success_fuel_preference] = 
+            await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
+
+            if (!err_fuel_preference) {
+              success['user_preference_fuels'] = success_fuel_preference;
+            } 
+          }
+
+          Handlers.onSuccess(res, {user: success, msg: errors});
+          resolve();
         }
-
-        if (update_fuel_preference) {
-          const [err_delete_fuel_pref, success_delete_fuel_pref] = 
-          await to<any>(FuelPreference.deleteByUser(user_id));
-
-          const [err_create_preference_fuel, success_create_preference_fuel] = 
-            await to<IFuelDetail[]>(this.createFuelPreference(
-              user['user_preference_fuels'], user_id, errors));
-
-          success['user_preference_fuels'] = success_create_preference_fuel;
-        } else {
-          const [err_fuel_preference, success_fuel_preference] = 
-          await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
-
-          if (!err_fuel_preference) {
-            success['user_preference_fuels'] = success_fuel_preference;
-          } 
-        }
-
-        Handlers.onSuccess(res, {user: success, msg: errors});
       }
-    }
+    });
   }
 
-  public delete = (req: Request, res: Response) => {
-    const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
-    const user_id = parseInt(req.params.id);
-    
-    if (Authenticate.authorized(req, res, req.user, allowedRoles))
-    {
-      if (Authenticate.verifyUserType(req, res, req.user['role'], user_id, req.user['id']))
+  public delete = async (req: Request, res: Response) => {
+    new Promise(async (resolve) => {
+      const allowedRoles = [EUserRoles.ADMIN, EUserRoles.DRIVER];
+      const user_id = parseInt(req.params.id);
+
+      if (Authenticate.authorized(req, res, req.user, allowedRoles))
       {
-        User.delete(user_id)
-        .then(_.partial(Handlers.onSuccess, res))
-        .catch(_.partial(Handlers.onError, res, 'Error deleting user'));
+        if (Authenticate.verifyUserType(req, res, req.user['role'], user_id, req.user['id']))
+        {
+          const [err, user] = await to<IUserDetail>(User.delete(user_id));
+          
+          if (err) {
+            Handlers.dbErrorHandler(res, err);
+            resolve();
+          }
+
+          Handlers.onSuccess(res, user);
+          resolve();
+        }
       }
-    }
+    });
   }
 
   public forgotPassword = async (req: Request, res: Response) => {
-    const {username, email} = req.body;
+    return new Promise(async resolve => {
+      const {username, email} = req.body;
 
-    if (username || email) {
-      const [err, user] = await to<IUserDetail>(User.readByEmailOrUsername(email, username));
-      
-      if (err) {
-        Handlers.dbErrorHandler(res, err)
-        return;
-      }
-
-      const redis = new Redis();
-      const [err_token, token] = await to<string>(generateRadomToken());
+      if (username || email) {
+        const [err, user] = await to<IUserDetail>(User.readByEmailOrUsername(email, username));
+        
+        if (err) {
+          Handlers.dbErrorHandler(res, err)
+          resolve();
+        }
   
-      if (err_token) {
-        Handlers.onError(res, 'It was not possible to generate the token');
-        return;
-      }
-
-      redis.createRecoverPassword(token, user.id.toString());
-  
-      const [err_email, success_email] = 
-      await to<any>(Nodemailer.sendEmailRecoverPassword(user.email, token));
+        const redis = new Redis();
+        const [err_token, token] = await to<string>(generateRadomToken());
     
-      if (err_email) {
-        Handlers.onError(res, 'It was not possible to send the email');
-        return;
+        if (err_token || !user || !user.id) {
+          Handlers.onError(res, 'It was not possible to generate the token');
+          resolve();
+        }
+  
+        redis.createRecoverPassword(token, user.id.toString());
+    
+        const [err_email, success_email] = 
+        await to<any>(Nodemailer.sendEmailRecoverPassword(user.email, token));
+      
+        if (err_email) {
+          Handlers.onError(res, 'It was not possible to send the email');
+          resolve();
+        }
+  
+        Handlers.onSuccess(res, 'E-mail sent');
+        resolve();
+      } else {
+        Handlers.onError(res, 'E-mail/Phone number and password are required');
+        resolve();
       }
-
-      Handlers.onSuccess(res, 'E-mail sent');
-    } else {
-      Handlers.onError(res, 'E-mail/Phone number and password are required');
-    }
+    });
   }
 
   public recovryPassword = async (req: Request, res: Response) => {
