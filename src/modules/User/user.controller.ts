@@ -22,7 +22,7 @@ class UserController {
     body['etacoins'] = 0;
 
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
-
+    console.log(errCreateUser)
     if (errCreateUser) {
       Handlers.dbErrorHandler(res, errCreateUser);
       return;
