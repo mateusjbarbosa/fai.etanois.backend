@@ -42,7 +42,7 @@ export default function (sequelize, DataTypes) {
           args: [10, 100],
           msg: 'E-mail is too short or too large'
         },
-        isEmail:{
+        isEmail: {
           args: true,
           msg: 'E-mail is invalid'
         },
@@ -52,7 +52,7 @@ export default function (sequelize, DataTypes) {
       }
     },
     username: {
-      type: DataTypes.STRING(12),
+      type: DataTypes.STRING(30),
       allowNull: false,
       unique: {
         args: true,
@@ -64,7 +64,7 @@ export default function (sequelize, DataTypes) {
           msg: 'Username can\'t be empty'
         },
         len: {
-          args: [3, 12],
+          args: [3, 30],
           msg: 'Username is too short or too large'
         },
         notNull: {
@@ -169,7 +169,7 @@ export default function (sequelize, DataTypes) {
           arg: true,
           msg: 'Payment format can\'t be empty'
         },
-        isIn: 
+        isIn:
         {
           args: [['money', 'credit_card', 'both']],
           msg: 'Payment format is invalid'
@@ -213,7 +213,7 @@ export default function (sequelize, DataTypes) {
   User.beforeCreate((user) => {
     return hashPassword(user);
   });
-  
+
   function hashPassword(user) {
     if (user.password) {
       const salt = bcrypt.genSaltSync(10);
