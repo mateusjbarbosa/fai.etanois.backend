@@ -1,17 +1,17 @@
-import { Request, Response} from 'express';
 import * as _ from 'lodash';
 import * as bcrypt from 'bcrypt';
 import User from './user.service';
 import FuelPreference from './fuel-preference.service';
 import Handlers from '../../core/handlers/response-handlers';
 import Nodemailer from '../../core/nodemailer/nodemailer';
+import Redis from '../../core/redis/redis';
+import Authenticate from '../Auth/authenticate.service'
+import Fuel from '../Fuel/fuel.service';
+import { Request, Response} from 'express';
 import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
 import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
 import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
 import { IUserPreferenceFuel } from './fuel-preference.module';
-import Redis from '../../core/redis/redis';
-import Authenticate from '../Auth/authenticate.service'
-import Fuel from '../Fuel/fuel.service';
 
 
 class UserController {
