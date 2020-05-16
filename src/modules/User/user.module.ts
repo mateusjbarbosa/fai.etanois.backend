@@ -15,7 +15,7 @@ export enum EPaymentMode {
 
 export interface IUser {
   readonly id: number,
-  username: string[30],
+  username: string,
   email: string,
   name: string,
   password: string,
@@ -30,7 +30,7 @@ export interface IUser {
 
 export interface IUserDetail {
   readonly id: number,
-  username: string[30],
+  username: string,
   email: string,
   name: string,
   cep: string,
@@ -43,7 +43,7 @@ export interface IUserDetail {
 
 export interface IUserForAuthorization {
   id: number,
-  username: string[30],
+  username: string,
   email: string,
   password: string,
   role: EUserRoles
