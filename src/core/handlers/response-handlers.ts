@@ -20,8 +20,12 @@ class Handlers {
 
   sendToken(res: Response, user: any) {
     const token = Authenticate.getToken(user);
+    const payload = {
+      token: token,
+      id: user.id
+    }
 
-    res.status(HttpStatus.OK).json({ token: token });
+    res.status(HttpStatus.OK).json({ payload });
   }
 
   onSuccess(res: Response, data: any) {
