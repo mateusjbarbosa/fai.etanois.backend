@@ -1,6 +1,5 @@
 import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
   IUserForAuthorization} from './user.module';
-import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
 const model = require('../../entities');
