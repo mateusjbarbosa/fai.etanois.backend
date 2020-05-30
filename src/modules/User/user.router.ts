@@ -18,6 +18,11 @@ export class UserRouterModule extends BaseRouterModule {
           endpoint: this.baseEndpoint + 'forgot_password',
           callback: UserController.forgotPassword,
           isProtected: false
+        },
+        {
+          endpoint: this.baseEndpoint + 'verify_use_of_credentials',
+          callback: UserController.verifyExistenceCredentials,
+          isProtected: false
         }
       ],
       get: [
@@ -38,7 +43,7 @@ export class UserRouterModule extends BaseRouterModule {
         },
         {
           endpoint: this.baseEndpoint + 'activate_account/:token',
-          callback: UserController.activateAccout,
+          callback: UserController.activateAccount,
           isProtected: false
         }
       ],

@@ -23,6 +23,10 @@ class UserController {
 
     body['etacoins'] = 0;
 
+    if (body['date_acceptance_therms_use']) {
+      delete body.date_acceptance_therms_use
+    }
+
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
     
     if (errCreateUser) {
@@ -282,7 +286,7 @@ class UserController {
     Handlers.sendToken(res, user);
   }
 
-  public activateAccout = async (req: Request, res: Response) => {
+  public activateAccount = async (req: Request, res: Response) => {
     const [errToken, user] =
       await to<IUserForAuthorization>(Authenticate.getJwtPayload(req.params.token));
 
@@ -299,6 +303,17 @@ class UserController {
     }
 
     Handlers.onSuccess(res, {user: success});
+  }
+
+  public verifyExistenceCredentials = async (req: Request, res: Response) => {
+    const {email, username} = req.body;
+    const [err, result] = await to<Object>(User.verifyExistenceCredentials(username, email));
+
+    if (err) {
+      console.log(err);
+    }
+
+    Handlers.onSuccess(res, {use_of_credentials: result});
   }
 }
 
