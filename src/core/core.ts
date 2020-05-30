@@ -6,6 +6,8 @@ import * as morgan from 'morgan';
 import * as bodyParser from 'body-parser';
 import Handlers from './handlers/response-handlers';
 
+const cors = require('cors');
+
 export class CoreModule {
   private express: Application;
   private routerModule;
@@ -24,6 +26,7 @@ export class CoreModule {
     this.express.use(bodyParser.json());
     this.express.use(Handlers.errorHandlerApi);
     this.express.use(AuthService.initialize());
+    this.express.use(cors());
   }
 
   public getApplication(): Application {
