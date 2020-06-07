@@ -97,10 +97,6 @@ export default function (sequelize, DataTypes) {
           args: true,
           msg: 'Password can\'t be empty'
         },
-        len: {
-          args: [6, 20],
-          msg: 'Password is too short or too large'
-        },
         notNull: {
           msg: 'Password is required'
         }
