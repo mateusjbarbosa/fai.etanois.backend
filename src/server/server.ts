@@ -26,6 +26,8 @@ export class Server {
     this.server.on('listening', () => {
       let address: any = this.server.address();
       console.log(`Server listening on ${address.address}${address.port}`)
+      console.log('API Version: 1')
+      console.log('Last Update: 07/06/2020')
     });
   }
 
