@@ -1,5 +1,5 @@
 import { Request, Response} from 'express';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt } from 'passport-jwt';
 import Handlers from '../../core/handlers/response-handlers';
 import Configuration from '../../config/config';
 import { EUserRoles } from '../User/user.module';
