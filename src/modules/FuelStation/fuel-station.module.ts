@@ -1,4 +1,4 @@
-import { IUserDetail } from '../User/user.module';
+import { IUserDetail, create } from '../User/user.module';
 
 export interface IFuelStation {
   readonly id: number,
@@ -31,10 +31,19 @@ export interface IFuelStationDetail {
   mechanical: boolean,
   time_to_open: string,
   time_to_close: string,
-  user: IUserDetail
+  User: IUserDetail
 }
 
-export function createFuelStation(fuel_station: IFuelStation): IFuelStationDetail {
-  console.log(fuel_station)
-  return null
+export function createFuelStation(fuel_station: IFuelStationDetail): IFuelStationDetail {
+  let { id, cnpj, phone_number, name, street, neighborhood, cep, flag_of_fuel_station, restaurant,
+    car_wash, mechanical, time_to_open, time_to_close, User } = fuel_station;
+
+  if (User) {
+    User = create(User);
+  }
+
+  return {
+    id, cnpj, phone_number, name, street, neighborhood, cep, flag_of_fuel_station, restaurant,
+    car_wash, mechanical, time_to_open, time_to_close, User
+  }
 }

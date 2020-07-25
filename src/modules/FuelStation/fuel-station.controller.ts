@@ -3,7 +3,6 @@ import FuelStation from './fuel-station.service';
 import { Request, Response } from 'express';
 import { to, isCNPJ, isCEP, onlyNumbers, trimAll, validateHhMm } from '../../core/util/util';
 import { IFuelStationDetail } from './fuel-station.module';
-import { error } from 'console';
 
 class FuelStationController {
   constructor() { }
@@ -36,6 +35,24 @@ class FuelStationController {
 
     Handlers.onSuccess(res, { fuel_station: success_message });
   };
+
+  public readOnly = async (req: Request, res: Response) => {
+    return new Promise(async resolve => {
+      const user_id = req.user['id'];
+      const fuel_station_id = parseInt(req.params.id);
+
+      const [err_read_fuel_station, fuel_station] = await to<IFuelStationDetail>(
+        FuelStation.readById(fuel_station_id, user_id));
+
+      if (err_read_fuel_station) {
+        Handlers.onError(res, 'Fuel Station not found');
+        return resolve();
+      }
+
+      Handlers.onSuccess(res, fuel_station);
+      return resolve();
+    });
+  }
 
   private validateBody(body: any): string {
     let error: string;
