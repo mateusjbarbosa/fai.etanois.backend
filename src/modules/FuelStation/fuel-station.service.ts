@@ -17,3 +17,5 @@ class FuelStation {
     return createFuelStation(success);
   }
 }
+
+export default new FuelStation();

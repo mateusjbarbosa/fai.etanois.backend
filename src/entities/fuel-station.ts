@@ -182,7 +182,7 @@ export default function (sequelize, DataTypes) {
       defaultValue: false
     },
     time_to_open: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false,
       validate: {
         notEmpty: {
@@ -195,7 +195,7 @@ export default function (sequelize, DataTypes) {
       }
     },
     time_to_close: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false,
       validate: {
         notEmpty: {
@@ -206,6 +206,20 @@ export default function (sequelize, DataTypes) {
           msg: 'Time to close is required'
         }
       }
+    },
+    activate: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          arg: true,
+          msg: 'Activate can\'t be empty'
+        },
+        notNull: {
+          msg: 'Activate is required'
+        }
+      },
+      defaultValue: false
     }
   });
 
