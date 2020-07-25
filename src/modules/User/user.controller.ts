@@ -23,6 +23,10 @@ class UserController {
 
     body['etacoins'] = 0;
 
+    if (body['date_acceptance_therms_use']) {
+      delete body.date_acceptance_therms_use
+    }
+
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
     
     if (errCreateUser) {
@@ -126,6 +130,10 @@ class UserController {
       const user = req.body;
       const role = req.user['role'];
       const errors: string[] = [];
+      const salt = bcrypt.genSaltSync(10);
+      let change_password_ok: boolean = true;
+      let change_password: boolean = false;
+      let old_password_ok: boolean = false;
       let update_fuel_preference: boolean = false;
       
       if (Authenticate.authorized(req, res, req.user, allowedRoles))
@@ -138,8 +146,6 @@ class UserController {
           keys.forEach(async property => {
             switch (property)
             {
-              case 'email':
-              case 'id':
               case 'name':
               case 'search_distance_with_route':
               case 'search_distance_without_route':
@@ -147,13 +153,25 @@ class UserController {
                 fields.push(property);
               break;
       
-              case 'password':
-                const salt = bcrypt.genSaltSync(10);
-                
-                user.password = bcrypt.hashSync(user.password, salt)
-                fields.push(property);
+              case 'old_password':
+                const isMatch = bcrypt.compareSync(user[property], req.user['password']);
+
+                if (isMatch) {
+                  old_password_ok = true;
+                  delete user[property];
+                }
               break;
-      
+
+              case 'new_password':
+                user['password'] = user[property];
+                change_password = true;
+                delete user[property];
+              break;
+
+              case 'password':
+                delete user[property];
+              break;
+
               case 'etacoins':
                 if (role == EUserRoles.ADMIN) {
                   fields.push(property);
@@ -166,33 +184,55 @@ class UserController {
             }
           });
 
-          const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
+          if (change_password) {
+            if (!old_password_ok) {
+              change_password_ok = false;
+            } else {
+              user.password = bcrypt.hashSync(user.password, salt)
+              fields.push('password');
+            }
+          }
 
-          if (err) {
-            Handlers.dbErrorHandler(res, err);
+          if (change_password_ok) {
+            const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
+
+            if (err) {
+              Handlers.dbErrorHandler(res, err);
+              resolve();
+            }
+  
+            if (update_fuel_preference) {
+              const [err_delete_fuel_pref, success_delete_fuel_pref] = 
+              await to<any>(FuelPreference.deleteByUser(user_id));
+  
+              const [err_create_preference_fuel, success_create_preference_fuel] = 
+                await to<IFuelDetail[]>(this.createFuelPreference(
+                  user['user_preference_fuels'], user_id, errors));
+  
+              success['user_preference_fuels'] = success_create_preference_fuel;
+            } else {
+              const [err_fuel_preference, success_fuel_preference] = 
+              await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
+  
+              if (!err_fuel_preference) {
+                success['user_preference_fuels'] = success_fuel_preference;
+              } 
+            }
+            
+            if (user['password']) {
+              const user_for_authenticate = {id: success.id, email: success.email,
+                password: user['password'], username: success.username}
+              const token = Authenticate.getToken(user_for_authenticate);
+              
+              success['token'] = token;
+            }
+
+            Handlers.onSuccess(res, {user: success, msg: errors});
+            resolve();
+          } else {
+            Handlers.authFail(req, res);
             resolve();
           }
-
-          if (update_fuel_preference) {
-            const [err_delete_fuel_pref, success_delete_fuel_pref] = 
-            await to<any>(FuelPreference.deleteByUser(user_id));
-
-            const [err_create_preference_fuel, success_create_preference_fuel] = 
-              await to<IFuelDetail[]>(this.createFuelPreference(
-                user['user_preference_fuels'], user_id, errors));
-
-            success['user_preference_fuels'] = success_create_preference_fuel;
-          } else {
-            const [err_fuel_preference, success_fuel_preference] = 
-            await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
-
-            if (!err_fuel_preference) {
-              success['user_preference_fuels'] = success_fuel_preference;
-            } 
-          }
-
-          Handlers.onSuccess(res, {user: success, msg: errors});
-          resolve();
         }
       }
     });
@@ -282,7 +322,7 @@ class UserController {
     Handlers.sendToken(res, user);
   }
 
-  public activateAccout = async (req: Request, res: Response) => {
+  public activateAccount = async (req: Request, res: Response) => {
     const [errToken, user] =
       await to<IUserForAuthorization>(Authenticate.getJwtPayload(req.params.token));
 
@@ -299,6 +339,17 @@ class UserController {
     }
 
     Handlers.onSuccess(res, {user: success});
+  }
+
+  public verifyExistenceCredentials = async (req: Request, res: Response) => {
+    const {email, username} = req.body;
+    const [err, result] = await to<Object>(User.verifyExistenceCredentials(username, email));
+
+    if (err) {
+      console.log(err);
+    }
+
+    Handlers.onSuccess(res, {use_of_credentials: result});
   }
 }
 

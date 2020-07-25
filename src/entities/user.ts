@@ -97,10 +97,6 @@ export default function (sequelize, DataTypes) {
           args: true,
           msg: 'Password can\'t be empty'
         },
-        len: {
-          args: [6, 20],
-          msg: 'Password is too short or too large'
-        },
         notNull: {
           msg: 'Password is required'
         }
@@ -110,7 +106,10 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.STRING(8),
       allowNull: true,
       validate: {
-        notEmpty: true,
+        notEmpty: {
+          args: true,
+          msg: 'CEP can\'t be empty'
+        },
         len: {
           args: [8, 8],
           msg: 'CEP is invalid'
@@ -193,6 +192,16 @@ export default function (sequelize, DataTypes) {
         }
       },
       defaultValue: 'driver'
+    },
+    date_acceptance_therms_use: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      validate: {
+        notEmpty: {
+          arg: true,
+          msg: 'Date acceptance of thems of use can\'t be empty'
+        }
+      }
     },
     activate: {
       type: DataTypes.BOOLEAN,
