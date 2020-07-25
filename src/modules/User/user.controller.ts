@@ -102,11 +102,11 @@ class UserController {
           
           if (err) {
             Handlers.onError(res, 'User not found');
-            resolve();
+            return resolve();
           }
   
           Handlers.onSuccess(res, success);
-          resolve();
+          return resolve();
         }
       }
     });
@@ -198,7 +198,7 @@ class UserController {
 
             if (err) {
               Handlers.dbErrorHandler(res, err);
-              resolve();
+              return resolve();
             }
   
             if (update_fuel_preference) {
@@ -228,10 +228,10 @@ class UserController {
             }
 
             Handlers.onSuccess(res, {user: success, msg: errors});
-            resolve();
+            return resolve();
           } else {
             Handlers.authFail(req, res);
-            resolve();
+            return resolve();
           }
         }
       }
@@ -251,11 +251,11 @@ class UserController {
           
           if (err) {
             Handlers.dbErrorHandler(res, err);
-            resolve();
+            return resolve();
           }
 
           Handlers.onSuccess(res, user);
-          resolve();
+          return resolve();
         }
       }
     });
@@ -270,7 +270,7 @@ class UserController {
         
         if (err) {
           Handlers.dbErrorHandler(res, err)
-          resolve();
+          return resolve();
         }
   
         const redis = new Redis();
@@ -278,7 +278,7 @@ class UserController {
     
         if (err_token || !user || !user.id) {
           Handlers.onError(res, 'It was not possible to generate the token');
-          resolve();
+          return resolve();
         }
   
         redis.createRecoverPassword(token, user.id.toString());
@@ -288,14 +288,14 @@ class UserController {
       
         if (err_email) {
           Handlers.onError(res, 'It was not possible to send the email');
-          resolve();
+          return resolve();
         }
   
         Handlers.onSuccess(res, 'E-mail sent');
-        resolve();
+        return resolve();
       } else {
         Handlers.onError(res, 'E-mail/Phone number and password are required');
-        resolve();
+        return resolve();
       }
     });
   }
