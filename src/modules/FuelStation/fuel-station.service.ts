@@ -5,9 +5,6 @@ const model = require('../../entities');
 const { Op } = require("sequelize");
 
 class FuelStation {
-  private join_user_fuel_preferences = { model: model.User, include: {
-    model: model.UserPreferenceFuel, include: { model: model.Fuel } } };
-    
   constructor() { }
 
   public async create(fuel: IFuelStation): Promise<IFuelStationDetail> {
@@ -31,8 +28,7 @@ class FuelStation {
     const [err, success] = await to<any>(model.FuelStation.findOne({
       where: {
         [Op.and]: [query]
-      },
-      include: [this.join_user_fuel_preferences],
+      }
     }));
 
     if (err) {
