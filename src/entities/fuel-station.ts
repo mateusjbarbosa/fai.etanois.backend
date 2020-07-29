@@ -1,3 +1,6 @@
+import { isCNPJ, isCEP, validateHhMm, onlyNumbers } from '../core/util/util';
+import { IFuelStation } from '../modules/FuelStation/fuel-station.module';
+
 export default function (sequelize, DataTypes) {
   const FuelStation = sequelize.define('FuelStation', {
     id: {
@@ -6,7 +9,7 @@ export default function (sequelize, DataTypes) {
       autoIncrement: true
     },
     cnpj: {
-      type: DataTypes.STRING(14),
+      type: DataTypes.STRING(18),
       allowNull: false,
       unique: {
         args: true,
@@ -18,11 +21,16 @@ export default function (sequelize, DataTypes) {
           msg: 'CNPJ can\'t be empty'
         },
         len: {
-          args: [14, 14],
+          args: [14, 18],
           msg: 'CNPJ is too short or too large'
         },
         notNull: {
           msg: 'CNPJ is required'
+        },
+        cnpj(value) {
+          if (!isCNPJ(value)) {
+            throw new Error('Invalid CNPJ');
+          }
         }
       }
     },
@@ -113,7 +121,7 @@ export default function (sequelize, DataTypes) {
       }
     },
     cep: {
-      type: DataTypes.STRING(8),
+      type: DataTypes.STRING(10),
       allowNull: false,
       validate: {
         notEmpty: {
@@ -121,11 +129,17 @@ export default function (sequelize, DataTypes) {
           msg: 'CEP can\'t be empty'
         },
         len: {
-          args: [8, 8],
+          args: [8, 10],
           msg: 'CEP is invalid'
         },
         notNull: {
           msg: 'CEP is required'
+        },
+        cpf(value) {
+          console.log(value)
+          if (!isCEP(value)) {
+            throw new Error('CEP is invalid');
+          }
         }
       }
     },
@@ -191,6 +205,11 @@ export default function (sequelize, DataTypes) {
         },
         notNull: {
           msg: 'Time to open is required'
+        },
+        is_time_to_open_valid(value) {
+          if (!validateHhMm(value)) {
+            throw new Error('Invalid opening hours');
+          }
         }
       }
     },
@@ -204,6 +223,11 @@ export default function (sequelize, DataTypes) {
         },
         notNull: {
           msg: 'Time to close is required'
+        },
+        is_time_to_close_valid(value) {
+          if (!validateHhMm(value)) {
+            throw new Error('Invalid close time');
+          }
         }
       }
     },
@@ -221,6 +245,11 @@ export default function (sequelize, DataTypes) {
       },
       defaultValue: false
     }
+  });
+
+  FuelStation.beforeCreate((fuel_station: IFuelStation) => {
+    fuel_station.cep = onlyNumbers(fuel_station.cep);
+    fuel_station.cnpj = onlyNumbers(fuel_station.cnpj);
   });
 
   return FuelStation;
