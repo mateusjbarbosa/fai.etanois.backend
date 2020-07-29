@@ -17,6 +17,11 @@ export interface IFuelStation {
   time_to_close: string,
 }
 
+export interface IManyFuelStations {
+  count: number,
+  fuel_stations: IFuelStationDetail[]
+}
+
 export interface IFuelStationDetail {
   readonly id: number,
   cnpj: string,
@@ -31,19 +36,22 @@ export interface IFuelStationDetail {
   mechanical: boolean,
   time_to_open: string,
   time_to_close: string,
-  User: IUserDetail
 }
 
-export function createFuelStation(fuel_station: IFuelStationDetail): IFuelStationDetail {
+export function createFuelStation(fuel_station: any): IFuelStationDetail {
   let { id, cnpj, phone_number, name, street, neighborhood, cep, flag_of_fuel_station, restaurant,
-    car_wash, mechanical, time_to_open, time_to_close, User } = fuel_station;
-
-  if (User) {
-    User = create(User);
-  }
+    car_wash, mechanical, time_to_open, time_to_close } = fuel_station;
 
   return {
     id, cnpj, phone_number, name, street, neighborhood, cep, flag_of_fuel_station, restaurant,
-    car_wash, mechanical, time_to_open, time_to_close, User
+    car_wash, mechanical, time_to_open, time_to_close
   }
+}
+
+export function createManyFuelStations(data: any): IManyFuelStations{
+  const fuel_stations: IFuelStationDetail[] = data.rows.map(createFuelStation)
+  const count = data.count;
+  const many_fuel_stations: IManyFuelStations = {count, fuel_stations};
+  
+  return many_fuel_stations
 }

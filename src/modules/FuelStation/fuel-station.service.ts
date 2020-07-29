@@ -1,5 +1,6 @@
 import { to } from '../../core/util/util';
-import { IFuelStation, IFuelStationDetail, createFuelStation } from './fuel-station.module';
+import { IFuelStation, IFuelStationDetail, createFuelStation, createManyFuelStations }
+  from './fuel-station.module';
 
 const model = require('../../entities');
 const { Op } = require("sequelize");
@@ -39,6 +40,32 @@ class FuelStation {
       return createFuelStation(success);
     } else {
       throw { errors: [{ message: 'Fuel Station not found' }] };
+    }
+  }
+
+  public async readByUser(user_id: number, page: number): Promise<any> {
+    const fuel_station_by_page: number = 5;
+    let query = {};
+
+    query['user_id'] = user_id;
+    query['activate'] = true;
+
+    const [err, success] = await to<any>(model.FuelStation.findAndCountAll({
+      where: {
+        [Op.and]: [query]
+      },
+      offset: (page - 1) * fuel_station_by_page,
+      limit: fuel_station_by_page
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    if (success) {
+      return (createManyFuelStations(success));
+    } else {
+      throw { errors: [{ message: 'There are no fuel stations' }] };
     }
   }
 }

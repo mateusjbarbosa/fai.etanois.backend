@@ -20,6 +20,11 @@ export class FuelStationRouterModule extends BaseRouterModule {
           endpoint: this.baseEndpoint + ':id',
           callback: FuelStationController.readOnly,
           isProtected: true
+        },
+        {
+          endpoint: this.baseEndpoint + 'read-all/:page',
+          callback: FuelStationController.readAllByUser,
+          isProtected: true
         }
       ]
     }

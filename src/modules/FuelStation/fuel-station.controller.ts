@@ -45,12 +45,34 @@ class FuelStationController {
         FuelStation.readById(fuel_station_id, user_id));
 
       if (err_read_fuel_station) {
-        Handlers.onError(res, 'Fuel Station not found');
+        Handlers.dbErrorHandler(res, err_read_fuel_station);
         return resolve();
       }
 
       Handlers.onSuccess(res, fuel_station);
       return resolve();
+    });
+  }
+
+  public readAllByUser = async (req: Request, res: Response) => {
+    return new Promise(async resolve => {
+      const user_id = req.user['id'];
+      const page = parseInt(req.params.page);
+
+      if (page < 1) {
+        Handlers.onError(res, 'The page must be greater than or equal to 1')
+      }
+
+      const [err_read_fuel_stations, fuel_stations] = await to<any>(
+        FuelStation.readByUser(user_id, page));
+
+        if (err_read_fuel_stations) {
+          Handlers.dbErrorHandler(res, err_read_fuel_stations);
+          return resolve();
+        }
+
+        Handlers.onSuccess(res, fuel_stations);
+        return resolve();
     });
   }
 
