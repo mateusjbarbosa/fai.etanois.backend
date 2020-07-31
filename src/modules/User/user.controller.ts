@@ -28,7 +28,7 @@ class UserController {
     }
 
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
-    
+
     if (errCreateUser) {
       Handlers.dbErrorHandler(res, errCreateUser);
       return;
@@ -150,6 +150,7 @@ class UserController {
               case 'search_distance_with_route':
               case 'search_distance_without_route':
               case 'payment_mode':
+              case 'cep':
                 fields.push(property);
               break;
       
