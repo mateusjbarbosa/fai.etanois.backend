@@ -1,4 +1,4 @@
-import { isCNPJ, isCEP, validateHhMm, onlyNumbers } from '../core/util/util';
+import { isCNPJ, isCEP, validateHhMm, onlyNumbers, ICep, to } from '../core/util/util';
 import { IFuelStation } from '../modules/FuelStation/fuel-station.module';
 
 export default function (sequelize, DataTypes) {
@@ -128,16 +128,14 @@ export default function (sequelize, DataTypes) {
           args: true,
           msg: 'CEP can\'t be empty'
         },
-        len: {
-          args: [8, 10],
-          msg: 'CEP is invalid'
-        },
         notNull: {
           msg: 'CEP is required'
         },
-        cpf(value) {
-          console.log(value)
-          if (!isCEP(value)) {
+        async cep(value) {
+          console.log()
+          const [err, success] = await to<ICep>(isCEP(value));
+
+          if (err) {
             throw new Error('CEP is invalid');
           }
         }

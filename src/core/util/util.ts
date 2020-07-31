@@ -1,6 +1,16 @@
 import * as crypto from 'crypto'
 import { trim } from 'lodash';
 
+const cep_promise = require("cep-promise")
+
+export interface ICep {
+  cep: string,
+  city: string,
+  neighborhood: string,
+  state: string,
+  street: string
+}
+
 export const to = <T>(promise: Promise<T>): Promise<[Error | undefined, T]> =>
   promise
     .then<[undefined, T]>((res: T) => [undefined, res])
@@ -98,20 +108,17 @@ export function isCNPJ(cnpj: string): boolean {
   return true;
 }
 
-export function isCEP(cep: string): boolean {
-  var obj_er = /^[0-9]{2}.[0-9]{3}-[0-9]{3}$/;
+export async function isCEP(cep: string): Promise<ICep> {
+  return new Promise(async (resolve, reject) => {
+    onlyNumbers(cep);
+    const [err, success] = await to<ICep>(cep_promise(cep));
 
-  if (cep)
-  {
-    cep = cep.trim()
-
-    if (cep.length > 0) {
-      if (obj_er.test(cep))
-        return true;
+    if (err) {
+      reject(err)
     }
-  }
 
-  return false;
+    resolve(success);
+  });
 }
 
 export function trimAll(object: any): any {
