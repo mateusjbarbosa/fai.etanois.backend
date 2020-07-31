@@ -121,7 +121,7 @@ export default function (sequelize, DataTypes) {
       }
     },
     cep: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.STRING(8),
       allowNull: false,
       validate: {
         notEmpty: {
