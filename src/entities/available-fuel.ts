@@ -45,10 +45,7 @@ module.exports = function (sequelize, DataTypes) {
           args: true,
           msg: 'Price is required'
         },
-        min: {
-          args: 0,
-          msg: 'Price cannot be less than zero'
-        }
+        min: 0
       }
     }
   });

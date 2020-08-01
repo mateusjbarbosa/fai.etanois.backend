@@ -132,7 +132,6 @@ module.exports = function (sequelize, DataTypes) {
           msg: 'CEP is required'
         },
         async cep(value) {
-          console.log()
           const [err, success] = await to<ICep>(isCEP(value));
 
           if (err) {

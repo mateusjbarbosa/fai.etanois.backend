@@ -1,5 +1,8 @@
 import { to } from '../../core/util/util';
-import { IFuelStation, IFuelStationDetail, createFuelStation, createManyFuelStations }
+import {
+  IFuelStation, IFuelStationDetail, createFuelStation, createManyFuelStations,
+  IManyFuelStations
+}
   from './fuel-station.module';
 
 const model = require('../../entities');
@@ -43,7 +46,7 @@ class FuelStation {
     }
   }
 
-  public async readByUser(user_id: number, page: number): Promise<any> {
+  public async readByUser(user_id: number, page: number): Promise<IManyFuelStations> {
     const fuel_station_by_page: number = 5;
     let query = {};
 
