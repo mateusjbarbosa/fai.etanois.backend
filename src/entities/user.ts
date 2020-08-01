@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { isCEP, ICep, to, onlyNumbers } from '../core/util/util';
 import { IUserDetail } from '../modules/User/user.module';
 
-export default function (sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const User = sequelize.define('User', {
     id: {
       type: DataTypes.INTEGER,

@@ -1,4 +1,4 @@
-export default function (sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Fuel = sequelize.define('Fuel', {
     id: {
       type: DataTypes.INTEGER,

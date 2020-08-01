@@ -1,7 +1,7 @@
 import { isCNPJ, isCEP, validateHhMm, onlyNumbers, ICep, to } from '../core/util/util';
 import { IFuelStation } from '../modules/FuelStation/fuel-station.module';
 
-export default function (sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const FuelStation = sequelize.define('FuelStation', {
     id: {
       type: DataTypes.INTEGER,
