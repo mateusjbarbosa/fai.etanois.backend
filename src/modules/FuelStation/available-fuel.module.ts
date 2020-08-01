@@ -16,3 +16,7 @@ export function createAvailableFuel(available_fuel: any): IAvailableFuelDetail {
 
   return { price, fuel_station_id, fuel_name };
 }
+
+export function createManyAvailableFuel(available_fuel: any[]): IAvailableFuelDetail[] {
+  return available_fuel.map(createAvailableFuel);
+}

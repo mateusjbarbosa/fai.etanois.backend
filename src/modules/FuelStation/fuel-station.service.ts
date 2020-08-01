@@ -9,6 +9,8 @@ const model = require('../../entities');
 const { Op } = require("sequelize");
 
 class FuelStation {
+  private include_available_fuel = 
+    [ {model: model.AvailableFuel, include: [ { model: model.Fuel } ]}]
   constructor() { }
 
   public async create(fuel: IFuelStation): Promise<IFuelStationDetail> {
@@ -32,7 +34,8 @@ class FuelStation {
     const [err, success] = await to<any>(model.FuelStation.findOne({
       where: {
         [Op.and]: [query]
-      }
+      },
+      include: this.include_available_fuel
     }));
 
     if (err) {
@@ -58,7 +61,8 @@ class FuelStation {
         [Op.and]: [query]
       },
       offset: (page - 1) * fuel_station_by_page,
-      limit: fuel_station_by_page
+      limit: fuel_station_by_page,
+      include: this.include_available_fuel
     }));
 
     if (err) {

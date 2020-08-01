@@ -1,4 +1,4 @@
-import { IUserDetail, create } from '../User/user.module';
+import { createManyAvailableFuel, IAvailableFuelDetail } from './available-fuel.module';
 
 export interface IFuelStation {
   readonly id: number,
@@ -36,15 +36,24 @@ export interface IFuelStationDetail {
   mechanical: boolean,
   time_to_open: string,
   time_to_close: string,
+  available_fuels: IAvailableFuelDetail[]
 }
 
 export function createFuelStation(fuel_station: any): IFuelStationDetail {
   let { id, cnpj, phone_number, name, street, neighborhood, cep, flag_of_fuel_station, restaurant,
     car_wash, mechanical, time_to_open, time_to_close } = fuel_station;
+  let available_fuels: IAvailableFuelDetail[];
+  
+  if (fuel_station['dataValues']['AvailableFuels']) {
+    fuel_station['dataValues']['AvailableFuels'].forEach(object => {
+      object['fuel_name'] = object['Fuel']['dataValues']['name'];
+    });
+    available_fuels = createManyAvailableFuel(fuel_station['dataValues']['AvailableFuels']);
+  }
 
   return {
     id, cnpj, phone_number, name, street, neighborhood, cep, flag_of_fuel_station, restaurant,
-    car_wash, mechanical, time_to_open, time_to_close
+    car_wash, mechanical, time_to_open, time_to_close, available_fuels
   }
 }
 
