@@ -124,8 +124,14 @@ export async function isCEP(cep: string): Promise<ICep> {
 export function trimAll(object: any): any {
   if (object) {
     Object.keys(object).forEach((key) => {
-      object[key] = trim(object[key]);
-    })
+      let type = typeof object[key];
+
+      if ("object" == type) {
+        trimAll(object[key]);
+      } else {
+        object[key] = type == 'string' ? object[key].trim() : object[key]
+      }
+    });
   }
 
   return object;
