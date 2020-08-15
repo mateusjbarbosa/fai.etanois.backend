@@ -22,11 +22,12 @@ export interface IUser {
   cep: string,
   search_distance_with_route: number,
   search_distance_without_route: number,
-  payment_mode: EPaymentMode,
+  payment_mode?: EPaymentMode,
   etacoins?: number
   role?: EUserRoles,
   user_preference_fuels?: IFuelDetail[],
-  date_acceptance_therms_use?: Date
+  date_acceptance_therms_use?: Date,
+  activate?: boolean
 }
 
 export interface IUserDetail {

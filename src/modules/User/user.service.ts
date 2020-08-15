@@ -1,4 +1,4 @@
-import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
+import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
   IUserForAuthorization} from './user.module';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
@@ -9,7 +9,7 @@ class User {
 
   constructor() {}
 
-  public async create(user: IUserDetail): Promise<IUserDetail> {
+  public async create(user: IUser): Promise<IUserDetail> {
     const [err, success] = await to<any>(model.User.create(user));
 
     if (err) {
