@@ -20,11 +20,11 @@ class AvailableFuel {
     return createAvailableFuel(success);
   }
 
-  public async readOnlyAvailableFuel(fuel_id: number, fuel_station_id: number): 
+  public async readOnlyAvailableFuel(fuel: number, fuel_station_id: number): 
     Promise<IAvailableFuelDetail> {
       let query = {};
 
-      query['fuel_id'] = fuel_id;
+      query['fuel'] = fuel;
       query['fuel_station_id'] = fuel_station_id;
 
       const [err, success] = await to<any>(model.AvailableFuel.findAndCountAll({

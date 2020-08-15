@@ -1,20 +1,15 @@
-export interface IFuel {
-  name: string
-  id?: number
-}
-
 export interface IFuelDetail {
   name: string
 }
 
-export function create(fuel: any): IFuel {
-  if (fuel) {
-    const { name, id } = fuel;
+export const fuels = ['Gasolina Comum', 'Gasolina Aditivada', 'Etanol']
 
-    return ({ name, id })
-  }
-}
+export function readAllFuels(): IFuelDetail[] {
+  let available_fuels: IFuelDetail[] = [];
 
-export function createFuels(fuels: any[]): IFuel[] {
-  return fuels.map(create);
+  fuels.forEach(item => {
+    available_fuels.push({name: item});
+  });
+
+  return available_fuels;
 }

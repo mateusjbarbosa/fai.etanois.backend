@@ -39,11 +39,11 @@ class User {
         [Op.and]: [query]
       },
       include: [
-        { model: model.UserPreferenceFuel,
-          include: { model: model.Fuel } }],
+        { model: model.UserPreferenceFuel }],
     }));
 
     if (err) {
+      console.log(err)
       throw err;
     }
 

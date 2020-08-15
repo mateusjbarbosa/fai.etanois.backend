@@ -74,7 +74,7 @@ export function create(user: any): IUserDetail {
 
     if (UserPreferenceFuels) {
       UserPreferenceFuels.forEach(item => {
-        user_preference_fuels.push({ name: item.dataValues.Fuel.dataValues.name })
+        user_preference_fuels.push({ name: item.dataValues.fuel })
       });
     }
 

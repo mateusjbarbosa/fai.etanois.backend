@@ -1,3 +1,5 @@
+import { fuels } from '../modules/Fuel/fuel.module';
+
 module.exports = function (sequelize, DataTypes) {
   const AvailableFuel = sequelize.define('AvailableFuel', {
     id: {
@@ -5,8 +7,8 @@ module.exports = function (sequelize, DataTypes) {
       primaryKey: true,
       autoIncrement: true
     },
-    fuel_id: {
-      type: DataTypes.INTEGER,
+    fuel: {
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: {
@@ -14,7 +16,11 @@ module.exports = function (sequelize, DataTypes) {
           msg: 'Fuel name cannot be empy'
         },
         notNull: {
-          msg: 'Fuel ID is required'
+          msg: 'Fuel is required'
+        },
+        isIn: {
+          args: [fuels],
+          msg: 'Invalid fuel'
         }
       },
       unique: 'availableFuel'

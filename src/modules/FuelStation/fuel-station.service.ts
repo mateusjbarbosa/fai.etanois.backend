@@ -10,7 +10,7 @@ const { Op } = require("sequelize");
 
 class FuelStation {
   private include_available_fuel = 
-    [ {model: model.AvailableFuel, include: [ { model: model.Fuel } ]}]
+    [ { model: model.AvailableFuel }]
   constructor() { }
 
   public async create(fuel: IFuelStation): Promise<IFuelStationDetail> {

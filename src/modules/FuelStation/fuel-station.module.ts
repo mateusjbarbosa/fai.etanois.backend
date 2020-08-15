@@ -45,9 +45,6 @@ export function createFuelStation(fuel_station: any): IFuelStationDetail {
   let available_fuels: IAvailableFuelDetail[];
   
   if (fuel_station['dataValues']['AvailableFuels']) {
-    fuel_station['dataValues']['AvailableFuels'].forEach(object => {
-      object['fuel_name'] = object['Fuel']['dataValues']['name'];
-    });
     available_fuels = createManyAvailableFuel(fuel_station['dataValues']['AvailableFuels']);
   }
 

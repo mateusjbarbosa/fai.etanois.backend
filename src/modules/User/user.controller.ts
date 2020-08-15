@@ -6,12 +6,12 @@ import Handlers from '../../core/handlers/response-handlers';
 import Nodemailer from '../../core/nodemailer/nodemailer';
 import Redis from '../../core/redis/redis';
 import Authenticate from '../Auth/authenticate.service'
-import Fuel from '../Fuel/fuel.service';
 import { Request, Response} from 'express';
 import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
 import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
-import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
+import { IFuelDetail, readAllFuels } from '../Fuel/fuel.module';
 import { IUserPreferenceFuel } from './fuel-preference.module';
+import { object } from 'testdouble';
 
 
 class UserController {
@@ -43,9 +43,11 @@ class UserController {
       }
     }
 
+    console.log('opa')
     const [errEmail, successEmail] =
       await to<any>(Nodemailer.sendEmailActivateAccount(user.email, Authenticate.getToken(user)));
-
+      console.log('opaaa')
+      console.log(successEmail)
     if (errEmail) {
       errors.push('It was not possible to send the email');
     }
@@ -55,19 +57,14 @@ class UserController {
 
   private async createFuelPreference(fuelPreference: IFuelDetail[], userId: number, errors: any[]):
     Promise<IFuelDetail[]> {
-    const [err, fuels] = await to<IFuel[]>(Fuel.getAll());
+    const fuels = readAllFuels();
     let userPreference: IFuelDetail[] = [];
-
-    if (err) {
-      errors.push('It was not possible to create the fuels');
-      return;
-    }
 
     const promises = fuelPreference.map(async (object) => {
       const index = findWithAttr(fuels, 'name', object.name);
 
       if (index >= 0) {
-        const fuelDetail: IUserPreferenceFuel = {fuel_id: fuels[index].id, user_id: userId};
+        const fuelDetail: IUserPreferenceFuel = {fuel: fuels[index].name, user_id: userId};
         
         const [errFuel, fuelCreated] = 
           await to<IUserPreferenceFuel>(FuelPreference.create(fuelDetail));
@@ -80,7 +77,11 @@ class UserController {
           userPreference.push(fuelPreferenceDetail);
         }
       } else {
-        errors.push(`Unable to associate user with ${object.name}`);
+        if (object.name) {
+          errors.push(`Unable to associate user with ${object.name}`);
+        } else {
+          errors.push(`Fuel name is required`);
+        }
       }
     });
 

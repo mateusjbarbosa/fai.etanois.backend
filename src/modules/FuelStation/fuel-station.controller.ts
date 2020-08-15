@@ -1,13 +1,12 @@
 import Handlers from '../../core/handlers/response-handlers';
 import FuelStation from './fuel-station.service';
 import AvailableFuel from './available-fuel.service';
-import FuelService from '../Fuel/fuel.service';
 import { Request, Response } from 'express';
-import { to, trimAll } from '../../core/util/util';
+import { to, trimAll, findWithAttr } from '../../core/util/util';
 import { IFuelStationDetail, IManyFuelStations } from './fuel-station.module';
 import { IAvailableFuelDetail, IAvailableFuel }
   from './available-fuel.module';
-import { IFuel } from '../Fuel/fuel.module';
+import { readAllFuels, fuels } from '../Fuel/fuel.module';
 
 class FuelStationController {
   constructor() { }
@@ -110,13 +109,14 @@ class FuelStationController {
   private async crateManyAvailableFuel(available_fuel: IAvailableFuelDetail[],
     fuel_station_id: number, errors: string[]): Promise<IAvailableFuelDetail[]> {
     const available_fuels: IAvailableFuelDetail[] = [];
+    const fuels = readAllFuels();
     const promises = available_fuel.map(async (object: any) => {
-      const [err_fuel, success_fuel] = await to<IFuel>(FuelService.findByName(object.fuel_name));
+      const index = findWithAttr(fuels, 'name', object.fuel);
 
-      if (success_fuel) {
+      if (index >= 0) {
         if (!isNaN(parseFloat(object.price))) {
           const new_available_fuel: IAvailableFuel = {
-            fuel_id: success_fuel.id,
+            fuel: fuels[index].name,
             fuel_station_id: fuel_station_id, price: parseFloat(object.price)
           }
 
@@ -124,16 +124,16 @@ class FuelStationController {
             await to<IAvailableFuelDetail>(AvailableFuel.createAvailableFuel(new_available_fuel));
 
           if (err) {
-            errors.push(`Unable to provide ${object.fuel_name}`);
+            errors.push(`Unable to provide ${object.fuel}`);
           } else {
             available_fuels.push(object);
           }
         } else {
-          errors.push(`Price of ${object.fuel_name} is invalid`);
+          errors.push(`Price of ${object.fuel} is invalid`);
         }
       } else {
-        if (object.fuel_name) {
-          errors.push(`${object.fuel_name} does not exist`);
+        if (object.fuel) {
+          errors.push(`${object.fuel} does not exist`);
         } else {
           errors.push(`Fuel name is required`);
         }

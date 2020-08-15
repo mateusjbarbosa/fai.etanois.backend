@@ -1,20 +1,20 @@
 export interface IAvailableFuel {
   readonly id?: number,
   fuel_station_id: number,
-  fuel_id: number,
+  fuel: string,
   price: number,
 }
 
 export interface IAvailableFuelDetail {
   fuel_station_id: number,
-  fuel_name: string,
+  fuel: string,
   price: number,
 }
 
 export function createAvailableFuel(available_fuel: any): IAvailableFuelDetail {
-  const {price, fuel_station_id, fuel_name} = available_fuel;
+  const {price, fuel_station_id, fuel} = available_fuel;
 
-  return { price, fuel_station_id, fuel_name };
+  return { price, fuel_station_id, fuel };
 }
 
 export function createManyAvailableFuel(available_fuel: any[]): IAvailableFuelDetail[] {
