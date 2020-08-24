@@ -46,24 +46,45 @@ const brazil: IStatesOfCountry = {
 
 export const countries: IStatesOfCountry[] = [brazil];
 
-export function getLongNameOfStatesOfCountry(country: ESupportedCountry): string[] {
-  let states_long_name: string[] = [];
-
+export function getStatesOfCountry(country: ESupportedCountry): IState[] {
   const states: IState[][] = countries.map(element => {
     if (element.country == country) {
       return element.states
     }
   });
 
-  console.log(states)
+  return states[0];
+}
 
-  if (states[0]) {
-    states_long_name = states[0].map(element => {
+export function getLongNameOfStatesOfCountry(country: ESupportedCountry): string[] {
+  let states_long_name: string[] = [];
+
+  const states: IState[] = getStatesOfCountry(country);
+
+  if (states) {
+    states_long_name = states.map(element => {
       return element.long_name;
     })
   }
 
-  console.log(states_long_name)
-
   return states_long_name;
+}
+
+export function shortNameToLongName(country: ESupportedCountry, short_name: string): string {
+  const states: IState[] = getStatesOfCountry(country);
+  let state_long_name: string;
+
+  if (states) {
+     let index = states.findIndex(element => {
+      if (element.short_name == short_name) {
+        return true;
+      }
+
+      return false;
+    });
+
+    state_long_name = states[index].long_name;
+  }
+
+  return state_long_name;
 }
