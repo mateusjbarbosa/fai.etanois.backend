@@ -11,7 +11,6 @@ import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
 import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
 import { IFuelDetail, readAllFuels } from '../Fuel/fuel.module';
 import { IUserPreferenceFuel } from './fuel-preference.module';
-import { object } from 'testdouble';
 
 
 class UserController {
@@ -43,11 +42,8 @@ class UserController {
       }
     }
 
-    console.log('opa')
     const [errEmail, successEmail] =
       await to<any>(Nodemailer.sendEmailActivateAccount(user.email, Authenticate.getToken(user)));
-      console.log('opaaa')
-      console.log(successEmail)
     if (errEmail) {
       errors.push('It was not possible to send the email');
     }

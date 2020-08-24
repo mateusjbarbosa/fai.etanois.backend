@@ -6,6 +6,10 @@ export interface IDatabaseEnvorimmet {
   dialect: string,
 }
 
+export interface IApiMaps {
+  key: string
+}
+
 export interface IRedisEnvoriment {
   port: number,
   host: string
@@ -26,7 +30,8 @@ export interface IEnvorimment {
   serverPort: string,
   database: IDatabaseEnvorimmet,
   redis: IRedisEnvoriment,
-  email: IEmailEnvoriment
+  email: IEmailEnvoriment,
+  api_maps: IApiMaps,
   secret: string
 }
 
@@ -52,9 +57,12 @@ export class Envorimment {
       port: 587,
       secure: false,
       auth: {
-        user: 'jvitor@etanois.com.br',
-        pass: 'teste'
+        user: 'ednaldo@etanois.com.br',
+        pass: '326XAHvsLBH!Sf5'
       }
+    },
+    api_maps: {
+      key: 'teste'
     }
   },{
     envorimmentName: "test",
@@ -76,9 +84,12 @@ export class Envorimment {
       port: 587,
       secure: false,
       auth: {
-        user: 'jvitor@etanois.com.br',
-        pass: 'teste'
+        user: 'ednaldo@etanois.com.br',
+        pass: '326XAHvsLBH!Sf5'
       }
+    },
+    api_maps: {
+      key: 'teste'
     }
   }, {
     envorimmentName: "production",
@@ -100,9 +111,12 @@ export class Envorimment {
       port: 587,
       secure: false,
       auth: {
-        user: 'jvitor@etanois.com.br',
-        pass: 'teste'
+        user: 'ednaldo@etanois.com.br',
+        pass: '326XAHvsLBH!Sf5'
       }
+    },
+    api_maps: {
+      key: 'teste'
     }
   }];
   
