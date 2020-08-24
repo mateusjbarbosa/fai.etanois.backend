@@ -1,6 +1,8 @@
 import * as bcrypt from 'bcrypt';
+import { isCEP, ICep, to, onlyNumbers } from '../core/util/util';
+import { IUserDetail } from '../modules/User/user.module';
 
-export default function (sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const User = sequelize.define('User', {
     id: {
       type: DataTypes.INTEGER,
@@ -110,9 +112,14 @@ export default function (sequelize, DataTypes) {
           args: true,
           msg: 'CEP can\'t be empty'
         },
-        len: {
-          args: [8, 8],
-          msg: 'CEP is invalid'
+        async cep(value) {
+          if (value) {
+            const [err, success] = await to<ICep>(isCEP(value));
+
+            if (err) {
+              throw new Error('CEP is invalid');
+            }
+          }
         }
       },
     },
@@ -219,9 +226,14 @@ export default function (sequelize, DataTypes) {
     }
   });
 
-  User.beforeCreate((user) => {
+  User.beforeCreate((user: IUserDetail) => {
+    user.cep = onlyNumbers(user.cep);
     return hashPassword(user);
   });
+
+  User.beforeUpdate((user: IUserDetail) => {
+    user.cep = onlyNumbers(user.cep);
+  })
 
   function hashPassword(user) {
     if (user.password) {

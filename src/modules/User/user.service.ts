@@ -1,6 +1,5 @@
-import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
+import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
   IUserForAuthorization} from './user.module';
-import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
 const model = require('../../entities');
@@ -10,7 +9,7 @@ class User {
 
   constructor() {}
 
-  public async create(user: IUserDetail): Promise<IUserDetail> {
+  public async create(user: IUser): Promise<IUserDetail> {
     const [err, success] = await to<any>(model.User.create(user));
 
     if (err) {
@@ -40,11 +39,11 @@ class User {
         [Op.and]: [query]
       },
       include: [
-        { model: model.UserPreferenceFuel,
-          include: { model: model.Fuel } }],
+        { model: model.UserPreferenceFuel }],
     }));
 
     if (err) {
+      console.log(err)
       throw err;
     }
 

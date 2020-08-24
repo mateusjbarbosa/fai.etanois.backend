@@ -1,17 +1,16 @@
-import { Request, Response} from 'express';
 import * as _ from 'lodash';
 import * as bcrypt from 'bcrypt';
 import User from './user.service';
 import FuelPreference from './fuel-preference.service';
 import Handlers from '../../core/handlers/response-handlers';
 import Nodemailer from '../../core/nodemailer/nodemailer';
-import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
-import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
-import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
-import { IUserPreferenceFuel } from './fuel-preference.module';
 import Redis from '../../core/redis/redis';
 import Authenticate from '../Auth/authenticate.service'
-import Fuel from '../Fuel/fuel.service';
+import { Request, Response} from 'express';
+import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
+import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
+import { IFuelDetail, readAllFuels } from '../Fuel/fuel.module';
+import { IUserPreferenceFuel } from './fuel-preference.module';
 
 
 class UserController {
@@ -28,7 +27,7 @@ class UserController {
     }
 
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
-    
+
     if (errCreateUser) {
       Handlers.dbErrorHandler(res, errCreateUser);
       return;
@@ -45,7 +44,6 @@ class UserController {
 
     const [errEmail, successEmail] =
       await to<any>(Nodemailer.sendEmailActivateAccount(user.email, Authenticate.getToken(user)));
-
     if (errEmail) {
       errors.push('It was not possible to send the email');
     }
@@ -55,19 +53,14 @@ class UserController {
 
   private async createFuelPreference(fuelPreference: IFuelDetail[], userId: number, errors: any[]):
     Promise<IFuelDetail[]> {
-    const [err, fuels] = await to<IFuel[]>(Fuel.getAll());
+    const fuels = readAllFuels();
     let userPreference: IFuelDetail[] = [];
-
-    if (err) {
-      errors.push('It was not possible to create the fuels');
-      return;
-    }
 
     const promises = fuelPreference.map(async (object) => {
       const index = findWithAttr(fuels, 'name', object.name);
 
       if (index >= 0) {
-        const fuelDetail: IUserPreferenceFuel = {fuel_id: fuels[index].id, user_id: userId};
+        const fuelDetail: IUserPreferenceFuel = {fuel: fuels[index].name, user_id: userId};
         
         const [errFuel, fuelCreated] = 
           await to<IUserPreferenceFuel>(FuelPreference.create(fuelDetail));
@@ -80,7 +73,11 @@ class UserController {
           userPreference.push(fuelPreferenceDetail);
         }
       } else {
-        errors.push(`Unable to associate user with ${object.name}`);
+        if (object.name) {
+          errors.push(`Unable to associate user with ${object.name}`);
+        } else {
+          errors.push(`Fuel name is required`);
+        }
       }
     });
 
@@ -102,11 +99,11 @@ class UserController {
           
           if (err) {
             Handlers.onError(res, 'User not found');
-            resolve();
+            return resolve();
           }
   
           Handlers.onSuccess(res, success);
-          resolve();
+          return resolve();
         }
       }
     });
@@ -150,6 +147,7 @@ class UserController {
               case 'search_distance_with_route':
               case 'search_distance_without_route':
               case 'payment_mode':
+              case 'cep':
                 fields.push(property);
               break;
       
@@ -198,7 +196,7 @@ class UserController {
 
             if (err) {
               Handlers.dbErrorHandler(res, err);
-              resolve();
+              return resolve();
             }
   
             if (update_fuel_preference) {
@@ -228,10 +226,10 @@ class UserController {
             }
 
             Handlers.onSuccess(res, {user: success, msg: errors});
-            resolve();
+            return resolve();
           } else {
             Handlers.authFail(req, res);
-            resolve();
+            return resolve();
           }
         }
       }
@@ -251,11 +249,11 @@ class UserController {
           
           if (err) {
             Handlers.dbErrorHandler(res, err);
-            resolve();
+            return resolve();
           }
 
           Handlers.onSuccess(res, user);
-          resolve();
+          return resolve();
         }
       }
     });
@@ -270,7 +268,7 @@ class UserController {
         
         if (err) {
           Handlers.dbErrorHandler(res, err)
-          resolve();
+          return resolve();
         }
   
         const redis = new Redis();
@@ -278,7 +276,7 @@ class UserController {
     
         if (err_token || !user || !user.id) {
           Handlers.onError(res, 'It was not possible to generate the token');
-          resolve();
+          return resolve();
         }
   
         redis.createRecoverPassword(token, user.id.toString());
@@ -288,14 +286,14 @@ class UserController {
       
         if (err_email) {
           Handlers.onError(res, 'It was not possible to send the email');
-          resolve();
+          return resolve();
         }
   
         Handlers.onSuccess(res, 'E-mail sent');
-        resolve();
+        return resolve();
       } else {
         Handlers.onError(res, 'E-mail/Phone number and password are required');
-        resolve();
+        return resolve();
       }
     });
   }

@@ -8,32 +8,11 @@ export class FuelRouterModule extends BaseRouterModule {
 
   protected MODULE_ENDPOINT_MAP: ModuleEndpointMap = {
     [this.moduleName]: {
-      post: [
-        {
-          endpoint: this.baseEndpoint + 'new',
-          callback: FuelController.create,
-          isProtected: true
-        }
-      ],
       get: [
         {
           endpoint: this.baseEndpoint,
           callback: FuelController.readAll,
           isProtected: false
-        }
-      ],
-      patch: [
-        {
-          endpoint: this.baseEndpoint + ':name',
-          callback: FuelController.update,
-          isProtected: true, 
-        }
-      ],
-      delete: [
-        {
-          endpoint: this.baseEndpoint + ':name',
-          callback: FuelController.delete,
-          isProtected: true
         }
       ]
     }

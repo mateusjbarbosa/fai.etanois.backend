@@ -1,9 +1,13 @@
 export interface IDatabaseEnvorimmet {
-  username: string;
-  password: string;
-  database: string;
-  host: string;
-  dialect: string;
+  username: string,
+  password: string,
+  database: string,
+  host: string,
+  dialect: string,
+}
+
+export interface IApiMaps {
+  key: string
 }
 
 export interface IRedisEnvoriment {
@@ -11,11 +15,23 @@ export interface IRedisEnvoriment {
   host: string
 }
 
+export interface IEmailEnvoriment {
+  host: string,
+  port: number,
+  secure: boolean,
+  auth: {
+    user: string
+    pass: string
+  }
+}
+
 export interface IEnvorimment {
-  envorimmentName: string;
-  serverPort: string;
-  database: IDatabaseEnvorimmet;
-  redis: IRedisEnvoriment
+  envorimmentName: string,
+  serverPort: string,
+  database: IDatabaseEnvorimmet,
+  redis: IRedisEnvoriment,
+  email: IEmailEnvoriment,
+  api_maps: IApiMaps,
   secret: string
 }
 
@@ -35,7 +51,19 @@ export class Envorimment {
       host: '127.0.0.1'
     },
     serverPort: "80",
-    secret: 'S3CR3T'
+    secret: 'S3CR3T',
+    email: {
+      host: 'smtp.umbler.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'ednaldo@etanois.com.br',
+        pass: '326XAHvsLBH!Sf5'
+      }
+    },
+    api_maps: {
+      key: 'teste'
+    }
   },{
     envorimmentName: "test",
     database: {
@@ -50,7 +78,19 @@ export class Envorimment {
       host: '127.0.0.1'
     },
     serverPort: "80",
-    secret: 'S3CR3T'
+    secret: 'S3CR3T',
+    email: {
+      host: 'smtp.umbler.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'ednaldo@etanois.com.br',
+        pass: '326XAHvsLBH!Sf5'
+      }
+    },
+    api_maps: {
+      key: 'teste'
+    }
   }, {
     envorimmentName: "production",
     database: {
@@ -65,7 +105,19 @@ export class Envorimment {
       host: 'redis'
     },
     serverPort: process.env.DATABASE_SERVER_PORT || "3000",
-    secret: process.env.DATABASE_SECRET || "S3CR3T"
+    secret: process.env.DATABASE_SECRET || "S3CR3T",
+    email: {
+      host: 'smtp.umbler.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'ednaldo@etanois.com.br',
+        pass: '326XAHvsLBH!Sf5'
+      }
+    },
+    api_maps: {
+      key: 'teste'
+    }
   }];
   
   private envorimment: string

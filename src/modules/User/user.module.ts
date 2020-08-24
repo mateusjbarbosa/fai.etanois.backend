@@ -15,23 +15,24 @@ export enum EPaymentMode {
 
 export interface IUser {
   readonly id: number,
-  username: string[30],
+  username: string,
   email: string,
   name: string,
   password: string,
   cep: string,
   search_distance_with_route: number,
   search_distance_without_route: number,
-  payment_mode: EPaymentMode,
+  payment_mode?: EPaymentMode,
   etacoins?: number
   role?: EUserRoles,
   user_preference_fuels?: IFuelDetail[],
-  date_acceptance_therms_use?: Date
+  date_acceptance_therms_use?: Date,
+  activate?: boolean
 }
 
 export interface IUserDetail {
   readonly id: number,
-  username: string[30],
+  username: string,
   email: string,
   name: string,
   cep: string,
@@ -44,7 +45,7 @@ export interface IUserDetail {
 
 export interface IUserForAuthorization {
   id: number,
-  username: string[30],
+  username: string,
   email: string,
   password: string,
   role: EUserRoles
@@ -74,7 +75,7 @@ export function create(user: any): IUserDetail {
 
     if (UserPreferenceFuels) {
       UserPreferenceFuels.forEach(item => {
-        user_preference_fuels.push({ name: item.dataValues.Fuel.dataValues.name })
+        user_preference_fuels.push({ name: item.dataValues.fuel })
       });
     }
 
