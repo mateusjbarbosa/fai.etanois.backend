@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/mateusjbarbosa/fai.etanois.backend#readme",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.1.6",
     "bcrypt": "^5.0.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",

@@ -1,5 +1,5 @@
 import { IAddress } from './geocoding.module';
-import { Client, Status, GeocodeRequest, GeocodeResponse, LatLngLiteral }
+import { Client, Status, GeocodeResponse, LatLngLiteral, GeocodeRequest}
   from "@googlemaps/google-maps-services-js";
 import { to } from '../util/util';
 import Configuration from '../../config/config';
@@ -16,7 +16,7 @@ class Geocoding {
     const client = new Client();
     const address: IAddress = { street_number, street, neighborhood, city, state };
     const keys = Object.keys(address);
-    let geocode_request: GeocodeRequest;
+    let geocode_request: GeocodeRequest = {params: {key: Configuration.api_maps.key}};
     let address_map: string = '';
 
     keys.forEach((key, index) => {
@@ -32,8 +32,7 @@ class Geocoding {
       }
     });
 
-    geocode_request.params.address = address_map;
-    geocode_request.params.key = Configuration.api_maps.key;
+    geocode_request['params']['address'] = address_map;
 
     const [err, success] = await to<GeocodeResponse>(client.geocode(geocode_request));
 
