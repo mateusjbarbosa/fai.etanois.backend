@@ -1,34 +1,68 @@
 import Handlers from '../../core/handlers/response-handlers';
 import FuelStation from './fuel-station.service';
 import AvailableFuel from './available-fuel.service';
+import Geocoding from '../../core/geocoding/geocoding.service';
 import { Request, Response } from 'express';
-import { to, trimAll, findWithAttr } from '../../core/util/util';
+import { to, trimAll, findWithAttr, ICep, isCEP } from '../../core/util/util';
+import { shortNameToLongName, ESupportedCountry } from '../../core/util/util.states';
 import { IFuelStationDetail, IManyFuelStations } from './fuel-station.module';
 import { IAvailableFuelDetail, IAvailableFuel }
   from './available-fuel.module';
-import { readAllFuels, fuels } from '../Fuel/fuel.module';
+import { LatLngLiteral }
+  from "@googlemaps/google-maps-services-js";
+import { readAllFuels } from '../Fuel/fuel.module';
 
 class FuelStationController {
   constructor() { }
 
   public create = async (req: Request, res: Response) => {
-    let body = req.body;
-    const user_id = req.user['id'];
-    const success_message = 'Your fuel station has been created and is in approval phase.' +
-      'We will send an email with the situation soon'
+    return new Promise(async resolve => {
+      let body = req.body;
+      const user_id = req.user['id'];
+      const success_message = 'Your fuel station has been created and is in approval phase.' +
+        ' We will send an email with the situation soon'
 
-    body = trimAll(body);
-    body['user_id'] = user_id;
+      body = trimAll(body);
+      body['user_id'] = user_id;
 
-    const [err_create_fuel_station, fuel_station] = await to<IFuelStationDetail>(
-      FuelStation.create(body));
+      const [err_cep, success_cep] = await to<ICep>(isCEP(body['cep']));
 
-    if (err_create_fuel_station) {
-      Handlers.dbErrorHandler(res, err_create_fuel_station);
-      return;
-    }
+      if (err_cep) {
+        Handlers.onError(res, 'CEP is invalid')
+        return resolve();
+      }
 
-    Handlers.onSuccess(res, { fuel_station: success_message });
+      const street_number = body['street_number'];
+      const street = body['street'];
+      const neighborhood = body['neighborhood'];
+      const city = success_cep.city;
+      const state = shortNameToLongName(ESupportedCountry.BRAZIL, success_cep.state);
+      console.log(state)
+      const [err_geocoding, success_geocoding] = await to<LatLngLiteral>
+        (Geocoding.adrressToLatLngLiteral(street_number, street, neighborhood, city, state));
+
+      if (err_geocoding) {
+        console.log(err_geocoding)
+        Handlers.onError(res, err_geocoding.message);
+        return resolve();
+      }
+
+      body['city'] = city;
+      body['state'] = state;
+      body['lat'] = success_geocoding.lat;
+      body['lng'] = success_geocoding.lng;
+      
+      const [err_create_fuel_station, fuel_station] = await to<IFuelStationDetail>(
+        FuelStation.create(body));
+
+      if (err_create_fuel_station) {
+        Handlers.dbErrorHandler(res, err_create_fuel_station);
+        return resolve();
+      }
+
+      Handlers.onSuccess(res, { fuel_station: success_message });
+      return resolve();
+    });
   };
 
   public readOnly = async (req: Request, res: Response) => {

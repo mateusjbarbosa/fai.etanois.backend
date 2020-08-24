@@ -1,7 +1,9 @@
-import { isCNPJ, isCEP, validateHhMm, onlyNumbers, ICep, to } from '../core/util/util';
+import { isCNPJ, validateHhMm, onlyNumbers } from '../core/util/util';
+import { getLongNameOfStatesOfCountry, ESupportedCountry } from '../core/util/util.states';
 import { IFuelStation } from '../modules/FuelStation/fuel-station.module';
 
 module.exports = function (sequelize, DataTypes) {
+  const states = getLongNameOfStatesOfCountry(ESupportedCountry.BRAZIL);
   const FuelStation = sequelize.define('FuelStation', {
     id: {
       type: DataTypes.INTEGER,
@@ -86,6 +88,23 @@ module.exports = function (sequelize, DataTypes) {
         }
       }
     },
+    street_number: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Street number can\'t be empty'
+        },
+        len: {
+          args: [1, 10],
+          msg: 'Street number is too short or too large'
+        },
+        notNull: {
+          msg: 'Street number is required'
+        }
+      }
+    },
     street: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -120,6 +139,36 @@ module.exports = function (sequelize, DataTypes) {
         }
       }
     },
+    city: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'City can\'t be empty'
+        },
+        notNull: {
+          msg: 'City is required'
+        }
+      }
+    },
+    state: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'State can\'t be empty'
+        },
+        notNull: {
+          msg: 'State is required'
+        },
+        isIn: {
+          args: [states],
+          msg: 'Invalid state'
+        }
+      }
+    },
     cep: {
       type: DataTypes.STRING(8),
       allowNull: false,
@@ -130,13 +179,32 @@ module.exports = function (sequelize, DataTypes) {
         },
         notNull: {
           msg: 'CEP is required'
+        }
+      }
+    },
+    lat: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Lat can\'t be empty'
         },
-        async cep(value) {
-          const [err, success] = await to<ICep>(isCEP(value));
-
-          if (err) {
-            throw new Error('CEP is invalid');
-          }
+        notNull: {
+          msg: 'Lat is required'
+        }
+      }
+    },
+    lng: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Lng can\'t be empty'
+        },
+        notNull: {
+          msg: 'Lng is required'
         }
       }
     },
