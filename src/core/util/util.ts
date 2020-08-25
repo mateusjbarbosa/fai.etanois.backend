@@ -1,5 +1,4 @@
 import * as crypto from 'crypto'
-import { trim } from 'lodash';
 
 const cep_promise = require("cep-promise")
 

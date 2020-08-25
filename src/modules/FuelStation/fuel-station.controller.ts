@@ -8,8 +8,7 @@ import { shortNameToLongName, ESupportedCountry } from '../../core/util/util.sta
 import { IFuelStationDetail, IManyFuelStations } from './fuel-station.module';
 import { IAvailableFuelDetail, IAvailableFuel }
   from './available-fuel.module';
-import { LatLngLiteral }
-  from "@googlemaps/google-maps-services-js";
+import { LatLngLiteral } from "@googlemaps/google-maps-services-js";
 import { readAllFuels } from '../Fuel/fuel.module';
 
 class FuelStationController {
@@ -37,12 +36,10 @@ class FuelStationController {
       const neighborhood = body['neighborhood'];
       const city = success_cep.city;
       const state = shortNameToLongName(ESupportedCountry.BRAZIL, success_cep.state);
-      console.log(state)
       const [err_geocoding, success_geocoding] = await to<LatLngLiteral>
         (Geocoding.adrressToLatLngLiteral(street_number, street, neighborhood, city, state));
 
       if (err_geocoding) {
-        console.log(err_geocoding)
         Handlers.onError(res, err_geocoding.message);
         return resolve();
       }
