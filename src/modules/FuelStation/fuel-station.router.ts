@@ -28,7 +28,7 @@ export class FuelStationRouterModule extends BaseRouterModule {
           isProtected: true
         },
         {
-          endpoint: this.baseEndpoint + 'read-all/:page',
+          endpoint: this.baseEndpoint + 'read-by-user/:page',
           callback: FuelStationController.readAllByUser,
           isProtected: true
         }
