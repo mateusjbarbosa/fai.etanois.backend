@@ -1,5 +1,6 @@
 import { BaseRouterModule, ModuleEndpointMap } from '../../core/router/base-routes-module'
 import FuelStationController from './fuel-station.controller';
+import FuelStationAvailableFuelController from './available-fuel.controller';
 
 export class FuelStationRouterModule extends BaseRouterModule {
   constructor() {
@@ -16,7 +17,7 @@ export class FuelStationRouterModule extends BaseRouterModule {
         },
         {
           endpoint: this.baseEndpoint + ':id/available-fuel',
-          callback: FuelStationController.createAvailableFuel,
+          callback: FuelStationAvailableFuelController.createOrUpdateAvailableFuel,
           isProtected: true
         }
       ],

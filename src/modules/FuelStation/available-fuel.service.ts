@@ -1,6 +1,5 @@
 import { to } from '../../core/util/util';
 import { createAvailableFuel, IAvailableFuelDetail, IAvailableFuel } from './available-fuel.module'
-import console = require('console');
 
 const model = require('../../entities');
 const { Op } = require("sequelize");
