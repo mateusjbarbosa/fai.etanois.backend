@@ -62,7 +62,8 @@ class FuelStation {
       },
       offset: (page - 1) * fuel_station_by_page,
       limit: fuel_station_by_page,
-      include: this.include_available_fuel
+      include: this.include_available_fuel,
+      distinct: true
     }));
 
     if (err) {

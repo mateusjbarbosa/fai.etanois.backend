@@ -66,7 +66,7 @@ export function createFuelStation(fuel_station: any): IFuelStationDetail {
 
 export function createManyFuelStations(data: any): IManyFuelStations{
   const fuel_stations: IFuelStationDetail[] = data.rows.map(createFuelStation)
-  const count = data['rows'].length;
+  const count = data.count;
   const many_fuel_stations: IManyFuelStations = {count, fuel_stations};
   
   return many_fuel_stations
