@@ -4,7 +4,8 @@ import Geocoding from '../../core/geocoding/geocoding.service';
 import { Request, Response } from 'express';
 import { to, trimAll, ICep, isCEP } from '../../core/util/util';
 import { shortNameToLongName, ESupportedCountry } from '../../core/util/util.states';
-import { IFuelStationDetail, IManyFuelStations } from './fuel-station.module';
+import { IFuelStationDetail, IManyFuelStations, getAllFlagOfFuelStation } 
+  from './fuel-station.module';
 import { LatLngLiteral } from "@googlemaps/google-maps-services-js";
 
 class FuelStationController {
@@ -96,6 +97,12 @@ class FuelStationController {
       Handlers.onSuccess(res, fuel_stations);
       return resolve();
     });
+  }
+
+  public readAllFlag = async (req: Request, res: Response) => {
+    const flags: string[] = getAllFlagOfFuelStation();
+
+    Handlers.onSuccess(res, {flags: flags})
   }
 }
 

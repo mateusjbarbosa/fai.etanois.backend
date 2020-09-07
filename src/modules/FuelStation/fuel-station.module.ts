@@ -1,5 +1,19 @@
 import { createManyAvailableFuel, IAvailableFuelDetail } from './available-fuel.module';
 
+export enum EFlagOfFuelStation {
+  BRANCA = 'branca',
+  PETROBRAS = 'petrobras',
+  SHELL = 'shell',
+  IPIRANGA = 'ipiranga',
+  ALE = 'ale'
+}
+
+export function getAllFlagOfFuelStation(): string[] {
+  return Object.keys(EFlagOfFuelStation).map(object => {
+    return EFlagOfFuelStation[object];
+  })
+}
+
 export interface IFuelStation {
   readonly id: number,
   cnpj: string,
@@ -12,7 +26,7 @@ export interface IFuelStation {
   cep: string,
   lat: number,
   lng: number,
-  flag_of_fuel_station: string,
+  flag_of_fuel_station: EFlagOfFuelStation,
   restaurant: boolean,
   car_wash: boolean,
   mechanical: boolean,
@@ -38,7 +52,7 @@ export interface IFuelStationDetail {
   cep: string,
   lat: number,
   lng: number,
-  flag_of_fuel_station: string,
+  flag_of_fuel_station: EFlagOfFuelStation,
   restaurant: boolean,
   car_wash: boolean,
   mechanical: boolean,
