@@ -43,8 +43,14 @@ export class RouterModule {
       if(routerInfo) {
         const {isProtected, callback, endpoint} = routerInfo;
         isProtected 
-          ? this.express.route(endpoint).all(authenticate())[resgistredVeb](callback)
-          : this.express.route(endpoint)[resgistredVeb](callback);
+          ? this.express.route(endpoint).all(authenticate())[resgistredVeb](function (req, res, next) {
+            console.log(`\nEndpoint: ${endpoint}\n`);
+            next();
+          },callback)
+          : this.express.route(endpoint)[resgistredVeb](function (req, res, next) {
+            console.log(`\nEndpoint: ${endpoint}\n`);
+            next();
+          }, callback);
 
         console.log(`${resgistredVeb}: ${endpoint} | isProtected: ${isProtected}`);
       }
