@@ -7,40 +7,63 @@ import { Request, Response } from 'express';
 import { to, findWithAttr } from '../../core/util/util';
 import Handlers from '../../core/handlers/response-handlers';
 import FuelStation from './fuel-station.service';
+import { IUpdateElement, IElementUpdated, EUpdateError } from '../Generic/types-generic';
+import UpdateElementGeneric from '../Generic/update-element';
 
 class FuelStationAvailableFuelController {
   public createOrUpdateAvailableFuel = async (req: Request, res: Response) => {
     return new Promise(async resolve => {
       const fuel_station_id = parseInt(req.params.id);
       const user_id = req.user['id'];
-      let body = req.body['available_fuels'];
-
-      const [err_read_fuel_station, read_fuel_station] = await to<IFuelStationDetail>(
-        FuelStation.readById(fuel_station_id, user_id));
-
-      if (err_read_fuel_station) { // There's no registered fuel station whit the ID
-        Handlers.onError(res, 'Invalid fuel station');
-        return resolve();
-      }
-
-      const [err_delete_available_fuel, success_delete] = await to<any>(
-        AvailableFuel.deleteAvailableFuelByFuelStation(fuel_station_id));
-
-      if (err_delete_available_fuel) {
-        Handlers.onError(res, 'Error updating available fuel');
-        return resolve();
-      }
-
       const errors: string[] = [];
-      const [err_create, available_fuels] = await
-        to<IAvailableFuelDetail[]>(this.crateManyAvailableFuel(body, fuel_station_id, errors));
+      let body = req.body['available_fuels'];
+      const update_interfae: IUpdateElement = {
+        create_element: this.crateManyAvailableFuel,
+        args_create_element: [body, fuel_station_id, errors],
+        read_element: FuelStation.readById,
+        args_read_element: [fuel_station_id, user_id],
+        delete_element: AvailableFuel.deleteAvailableFuelByFuelStation,
+        args_delete_element: [fuel_station_id],
+      }
 
-      if (err_create) {
-        Handlers.onError(res, 'Formating invalid');
+      if (!body) {
+        Handlers.onError(res, 'Invalid available fuel');
         return resolve();
       }
 
-      Handlers.onSuccess(res, { available_fuels: available_fuels, msg: errors });
+      const update_element = new UpdateElementGeneric(update_interfae);
+
+      const [err, element_updated] = 
+      await to<IElementUpdated>(update_element.runUpdateElement());
+
+      if (err) {
+        Handlers.onError(res, 'Internal Error');
+        return resolve();
+      }
+
+      if (element_updated.big_mistake != EUpdateError.ERR_NONE) {
+        let message_err: string;
+
+        switch (element_updated.big_mistake) {
+          case EUpdateError.ERR_CREATE:
+            message_err = 'Internal error when creating fuels';
+          break;
+
+          case EUpdateError.ERR_READ:
+            message_err = 'Invalid fuel station';
+          break;
+
+          case EUpdateError.ERR_DELETE:
+              message_err = 'Internal error when updating fuels';
+          break;
+        }
+
+        Handlers.onError(res, message_err);
+      } else {
+        Handlers.onSuccess(res, { available_services: element_updated.element_updated, msg: errors });
+      }
+
+      return resolve();
     });
   }
 

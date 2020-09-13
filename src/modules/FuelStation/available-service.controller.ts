@@ -7,7 +7,6 @@ import FuelStation from './fuel-station.service';
 import UpdateElementGeneric from '../Generic/update-element';
 import AvailableService from './available-service.service';
 import Handlers from '../../core/handlers/response-handlers';
-import console = require('console');
 
 class FuelStationAvailableServiceController {
 
@@ -70,23 +69,6 @@ class FuelStationAvailableServiceController {
       }
 
       return resolve();
-
-      /*
-      const [err_read_fuel_station, read_fuel_station] = await to<IFuelStationDetail>(
-        FuelStation.readById(fuel_station_id, user_id));
-
-      if (err_read_fuel_station) { // There's no registered fuel station whit the ID
-        Handlers.onError(res, 'Invalid fuel station');
-        return resolve();
-      }
-
-      const [err_delete_available_service, success_delete] = await to<any>(
-        AvailableService.deleteAvailableServiceByFuelStation(fuel_station_id));
-
-      if (err_delete_available_service) {
-        Handlers.onError(res, 'Error updating available service');
-        return resolve();
-      }*/
     });
   }
 
