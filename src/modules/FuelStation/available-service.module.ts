@@ -29,9 +29,13 @@ export interface IAvailableServiceDetail {
   service_24_hours: boolean;
 }
 
-export function createAvailableService(available_service: IAvailableService) {
+export function createAvailableService(available_service: any): IAvailableServiceDetail {
   const {service_type, fuel_station_id, time_to_open, time_to_close, service_24_hours} = 
     available_service;
 
   return {service_type, fuel_station_id, time_to_open, time_to_close, service_24_hours};
+}
+
+export function createManyAvailableServices(available_services: any[]): IAvailableServiceDetail[] {
+  return available_services.map(createAvailableService);
 }

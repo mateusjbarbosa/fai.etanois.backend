@@ -1,4 +1,5 @@
 import { createManyAvailableFuel, IAvailableFuelDetail } from './available-fuel.module';
+import { createManyAvailableServices, IAvailableServiceDetail} from './available-service.module';
 
 export enum EFlagOfFuelStation {
   BRANCA = 'branca',
@@ -59,6 +60,7 @@ export interface IFuelStationDetail {
   time_to_open: string,
   time_to_close: string,
   available_fuels: IAvailableFuelDetail[]
+  available_services: IAvailableServiceDetail[]
 }
 
 export function createFuelStation(fuel_station: any): IFuelStationDetail {
@@ -66,15 +68,21 @@ export function createFuelStation(fuel_station: any): IFuelStationDetail {
     lat, lng, flag_of_fuel_station, restaurant, car_wash, mechanical, time_to_open, 
     time_to_close } = fuel_station;
   let available_fuels: IAvailableFuelDetail[];
+  let available_services: IAvailableServiceDetail[];
   
   if (fuel_station['dataValues']['AvailableFuels']) {
     available_fuels = createManyAvailableFuel(fuel_station['dataValues']['AvailableFuels']);
   }
 
+  if (fuel_station['dataValues']['AvailableServices']) {
+    available_services = createManyAvailableServices(
+      fuel_station['dataValues']['AvailableServices']);
+  }
+
   return {
     id, cnpj, phone_number, name, street_number, street, neighborhood, city, state, cep,
     lat, lng, flag_of_fuel_station, restaurant, car_wash, mechanical, time_to_open, time_to_close,
-    available_fuels
+    available_fuels, available_services
   }
 }
 
