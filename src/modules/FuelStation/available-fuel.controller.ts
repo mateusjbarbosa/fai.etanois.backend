@@ -55,7 +55,8 @@ class FuelStationAvailableFuelController {
         if (!isNaN(parseFloat(object.price))) {
           const new_available_fuel: IAvailableFuel = {
             fuel: fuels[index].name,
-            fuel_station_id: fuel_station_id, price: parseFloat(object.price)
+            fuel_station_id: fuel_station_id, 
+            price: parseFloat(object.price)
           }
 
           const [err, success] =

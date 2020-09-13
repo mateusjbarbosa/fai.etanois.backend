@@ -26,7 +26,7 @@ class AvailableFuel {
       query['fuel'] = fuel;
       query['fuel_station_id'] = fuel_station_id;
 
-      const [err, success] = await to<any>(model.AvailableFuel.findAndCountAll({
+      const [err, success] = await to<any>(model.AvailableFuel.findOne({
         where: {
           [Op.and]: [query]
         }
