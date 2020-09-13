@@ -1,4 +1,4 @@
-import { fuels } from '../modules/Fuel/fuel.module';
+import { getAvailableFuels } from '../modules/Fuel/fuel.module';
 
 module.exports = function (sequelize, DataTypes) {
   const AvailableFuel = sequelize.define('AvailableFuel', {
@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
           msg: 'Fuel is required'
         },
         isIn: {
-          args: [fuels],
+          args: [getAvailableFuels()],
           msg: 'Invalid fuel'
         }
       },

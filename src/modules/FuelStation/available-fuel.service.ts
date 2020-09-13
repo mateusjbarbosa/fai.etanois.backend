@@ -1,6 +1,5 @@
 import { to } from '../../core/util/util';
 import { createAvailableFuel, IAvailableFuelDetail, IAvailableFuel } from './available-fuel.module'
-import console = require('console');
 
 const model = require('../../entities');
 const { Op } = require("sequelize");
@@ -27,7 +26,7 @@ class AvailableFuel {
       query['fuel'] = fuel;
       query['fuel_station_id'] = fuel_station_id;
 
-      const [err, success] = await to<any>(model.AvailableFuel.findAndCountAll({
+      const [err, success] = await to<any>(model.AvailableFuel.findOne({
         where: {
           [Op.and]: [query]
         }

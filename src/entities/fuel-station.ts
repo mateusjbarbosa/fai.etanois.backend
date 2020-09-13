@@ -1,6 +1,7 @@
 import { isCNPJ, validateHhMm, onlyNumbers } from '../core/util/util';
 import { getLongNameOfStatesOfCountry, ESupportedCountry } from '../core/util/util.states';
-import { IFuelStation } from '../modules/FuelStation/fuel-station.module';
+import { IFuelStation, getAllFlagOfFuelStation, EFlagOfFuelStation } 
+  from '../modules/FuelStation/fuel-station.module';
 
 module.exports = function (sequelize, DataTypes) {
   const states = getLongNameOfStatesOfCountry(ESupportedCountry.BRAZIL);
@@ -210,13 +211,21 @@ module.exports = function (sequelize, DataTypes) {
     },
     flag_of_fuel_station: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
       validate: {
         notEmpty: {
           arg: true,
           msg: 'Flag of fuel station can\'t be empty'
+        },
+        notNull: {
+          msg: 'Flag of fuel station is required'
+        },
+        isIn: {
+          args: [getAllFlagOfFuelStation()],
+          msg: 'Flag of fuel station invalid'
         }
       },
+      defaultValue: EFlagOfFuelStation.BRANCA
     },
     restaurant: {
       type: DataTypes.BOOLEAN,
