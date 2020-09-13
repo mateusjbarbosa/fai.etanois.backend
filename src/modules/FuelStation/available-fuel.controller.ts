@@ -2,7 +2,6 @@ import { readAllFuels } from '../Fuel/fuel.module';
 import AvailableFuel from './available-fuel.service';
 import { IAvailableFuelDetail, IAvailableFuel }
   from './available-fuel.module';
-import { IFuelStationDetail } from './fuel-station.module';
 import { Request, Response } from 'express';
 import { to, findWithAttr } from '../../core/util/util';
 import Handlers from '../../core/handlers/response-handlers';

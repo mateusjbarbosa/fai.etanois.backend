@@ -11,7 +11,8 @@ import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
 import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
 import { IFuelDetail, readAllFuels } from '../Fuel/fuel.module';
 import { IUserPreferenceFuel } from './fuel-preference.module';
-
+import { IUpdateElement, IElementUpdated, EUpdateError } from '../Generic/types-generic';
+import UpdateElementGeneric from '../Generic/update-element';
 
 class UserController {
   constructor() {}
@@ -200,14 +201,36 @@ class UserController {
             }
   
             if (update_fuel_preference) {
-              const [err_delete_fuel_pref, success_delete_fuel_pref] = 
-              await to<any>(FuelPreference.deleteByUser(user_id));
-  
-              const [err_create_preference_fuel, success_create_preference_fuel] = 
-                await to<IFuelDetail[]>(this.createFuelPreference(
-                  user['user_preference_fuels'], user_id, errors));
-  
-              success['user_preference_fuels'] = success_create_preference_fuel;
+              const update_interfae: IUpdateElement = {
+                create_element: this.createFuelPreference,
+                args_create_element: [user['user_preference_fuels'], user_id, errors],
+                delete_element: FuelPreference.deleteByUser,
+                args_delete_element: [user_id],
+              }
+
+              const update_element = new UpdateElementGeneric(update_interfae);
+
+              const [err, element_updated] = 
+              await to<IElementUpdated>(update_element.runUpdateElement());
+
+              if (err) {
+                Handlers.onError(res, 'Internal Error');
+                return resolve();
+              }
+
+              if (element_updated.big_mistake != EUpdateError.ERR_NONE) {
+                switch (element_updated.big_mistake) {
+                  case EUpdateError.ERR_CREATE:
+                    errors.push('Internal error when creating preference fuels');
+                  break;
+        
+                  case EUpdateError.ERR_DELETE:
+                      errors.push('Internal error when updating preference fuels');
+                  break;
+                }
+              } else {
+                success['user_preference_fuels'] = element_updated.element_updated;
+              }
             } else {
               const [err_fuel_preference, success_fuel_preference] = 
               await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
