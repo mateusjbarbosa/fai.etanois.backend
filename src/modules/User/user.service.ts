@@ -1,6 +1,5 @@
-import { IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
+import { IUser, IUserDetail, createUsers, create, getUserForAuthorization, EUserRoles, 
   IUserForAuthorization} from './user.module';
-import Redis from '../../core/redis/redis';
 import * as Bluebird from 'bluebird';
 import { to } from '../../core/util/util';
 const model = require('../../entities');
@@ -10,7 +9,7 @@ class User {
 
   constructor() {}
 
-  public async create(user: IUserDetail): Promise<IUserDetail> {
+  public async create(user: IUser): Promise<IUserDetail> {
     const [err, success] = await to<any>(model.User.create(user));
 
     if (err) {
@@ -40,11 +39,11 @@ class User {
         [Op.and]: [query]
       },
       include: [
-        { model: model.UserPreferenceFuel,
-          include: { model: model.Fuel } }],
+        { model: model.UserPreferenceFuel }],
     }));
 
     if (err) {
+      console.log(err)
       throw err;
     }
 
@@ -145,13 +144,13 @@ class User {
       }
     });
 
+    user['date_acceptance_therms_use'] = new Date();
     query['activate'] = false;
-
     const [err, success] = await to<any>(model.User.update(user, {
         where: {
           [Op.and]: [query]
         },
-        fields: ['activate'],
+        fields: ['activate', 'date_acceptance_therms_use'],
         hooks: true,
         individualHooks: true
       }));
@@ -161,6 +160,36 @@ class User {
       }
       
       return create(success);
+  }
+
+  public async verifyExistenceCredentials(username: string, email: string): Promise<Object> {
+    const result = {email: 'free-to-use', username: 'free-to-use'}
+
+    if (username) {
+      const [err, amountUsername] = await to<any>(model.User.count({
+        where: { username }
+      }));
+
+      if (amountUsername > 0) {
+        result.username = 'in-use';
+      }
+    } else {
+      delete result.username
+    }
+
+    if (email) {
+      const [err, amountEmail] = await to<any>(model.User.count({
+        where: { email }
+      }));
+
+      if (amountEmail > 0) {
+        result.email = 'in-use';
+      }
+    } else {
+      delete result.email
+    }
+    
+    return result;
   }
 
   private generateQueryByCredential(email: string, username: string, id: number): object {

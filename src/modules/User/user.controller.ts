@@ -1,18 +1,18 @@
-import { Request, Response} from 'express';
 import * as _ from 'lodash';
 import * as bcrypt from 'bcrypt';
 import User from './user.service';
 import FuelPreference from './fuel-preference.service';
 import Handlers from '../../core/handlers/response-handlers';
 import Nodemailer from '../../core/nodemailer/nodemailer';
-import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
-import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
-import { IFuel, IFuelDetail } from '../Fuel/fuel.module';
-import { IUserPreferenceFuel } from './fuel-preference.module';
 import Redis from '../../core/redis/redis';
 import Authenticate from '../Auth/authenticate.service'
-import Fuel from '../Fuel/fuel.service';
-
+import { Request, Response} from 'express';
+import { EUserRoles, IUserDetail, IUserForAuthorization } from './user.module';
+import { to, findWithAttr, generateRadomToken } from '../../core/util/util';
+import { IFuelDetail, readAllFuels } from '../Fuel/fuel.module';
+import { IUserPreferenceFuel } from './fuel-preference.module';
+import { IUpdateElement, IElementUpdated, EUpdateError } from '../Generic/types-generic';
+import UpdateElementGeneric from '../Generic/update-element';
 
 class UserController {
   constructor() {}
@@ -23,8 +23,12 @@ class UserController {
 
     body['etacoins'] = 0;
 
+    if (body['date_acceptance_therms_use']) {
+      delete body.date_acceptance_therms_use
+    }
+
     const [errCreateUser, user] = await to<IUserDetail>(User.create(body))
-    
+
     if (errCreateUser) {
       Handlers.dbErrorHandler(res, errCreateUser);
       return;
@@ -41,7 +45,6 @@ class UserController {
 
     const [errEmail, successEmail] =
       await to<any>(Nodemailer.sendEmailActivateAccount(user.email, Authenticate.getToken(user)));
-
     if (errEmail) {
       errors.push('It was not possible to send the email');
     }
@@ -51,19 +54,14 @@ class UserController {
 
   private async createFuelPreference(fuelPreference: IFuelDetail[], userId: number, errors: any[]):
     Promise<IFuelDetail[]> {
-    const [err, fuels] = await to<IFuel[]>(Fuel.getAll());
+    const fuels = readAllFuels();
     let userPreference: IFuelDetail[] = [];
-
-    if (err) {
-      errors.push('It was not possible to create the fuels');
-      return;
-    }
 
     const promises = fuelPreference.map(async (object) => {
       const index = findWithAttr(fuels, 'name', object.name);
 
       if (index >= 0) {
-        const fuelDetail: IUserPreferenceFuel = {fuel_id: fuels[index].id, user_id: userId};
+        const fuelDetail: IUserPreferenceFuel = {fuel: fuels[index].name, user_id: userId};
         
         const [errFuel, fuelCreated] = 
           await to<IUserPreferenceFuel>(FuelPreference.create(fuelDetail));
@@ -76,7 +74,11 @@ class UserController {
           userPreference.push(fuelPreferenceDetail);
         }
       } else {
-        errors.push(`Unable to associate user with ${object.name}`);
+        if (object.name) {
+          errors.push(`Unable to associate user with ${object.name}`);
+        } else {
+          errors.push(`Fuel name is required`);
+        }
       }
     });
 
@@ -98,11 +100,11 @@ class UserController {
           
           if (err) {
             Handlers.onError(res, 'User not found');
-            resolve();
+            return resolve();
           }
   
           Handlers.onSuccess(res, success);
-          resolve();
+          return resolve();
         }
       }
     });
@@ -126,6 +128,10 @@ class UserController {
       const user = req.body;
       const role = req.user['role'];
       const errors: string[] = [];
+      const salt = bcrypt.genSaltSync(10);
+      let change_password_ok: boolean = true;
+      let change_password: boolean = false;
+      let old_password_ok: boolean = false;
       let update_fuel_preference: boolean = false;
       
       if (Authenticate.authorized(req, res, req.user, allowedRoles))
@@ -138,22 +144,33 @@ class UserController {
           keys.forEach(async property => {
             switch (property)
             {
-              case 'email':
-              case 'id':
               case 'name':
               case 'search_distance_with_route':
               case 'search_distance_without_route':
               case 'payment_mode':
+              case 'cep':
                 fields.push(property);
               break;
       
+              case 'old_password':
+                const isMatch = bcrypt.compareSync(user[property], req.user['password']);
+
+                if (isMatch) {
+                  old_password_ok = true;
+                  delete user[property];
+                }
+              break;
+
+              case 'new_password':
+                user['password'] = user[property];
+                change_password = true;
+                delete user[property];
+              break;
+
               case 'password':
-                const salt = bcrypt.genSaltSync(10);
-                
-                user.password = bcrypt.hashSync(user.password, salt)
-                fields.push(property);
+                delete user[property];
               break;
-      
+
               case 'etacoins':
                 if (role == EUserRoles.ADMIN) {
                   fields.push(property);
@@ -166,33 +183,77 @@ class UserController {
             }
           });
 
-          const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
-
-          if (err) {
-            Handlers.dbErrorHandler(res, err);
-            resolve();
+          if (change_password) {
+            if (!old_password_ok) {
+              change_password_ok = false;
+            } else {
+              user.password = bcrypt.hashSync(user.password, salt)
+              fields.push('password');
+            }
           }
 
-          if (update_fuel_preference) {
-            const [err_delete_fuel_pref, success_delete_fuel_pref] = 
-            await to<any>(FuelPreference.deleteByUser(user_id));
+          if (change_password_ok) {
+            const [err, success] = await to<IUserDetail>(User.update(user_id, user, fields));
 
-            const [err_create_preference_fuel, success_create_preference_fuel] = 
-              await to<IFuelDetail[]>(this.createFuelPreference(
-                user['user_preference_fuels'], user_id, errors));
+            if (err) {
+              Handlers.dbErrorHandler(res, err);
+              return resolve();
+            }
+  
+            if (update_fuel_preference) {
+              const update_interfae: IUpdateElement = {
+                create_element: this.createFuelPreference,
+                args_create_element: [user['user_preference_fuels'], user_id, errors],
+                delete_element: FuelPreference.deleteByUser,
+                args_delete_element: [user_id],
+              }
 
-            success['user_preference_fuels'] = success_create_preference_fuel;
+              const update_element = new UpdateElementGeneric(update_interfae);
+
+              const [err, element_updated] = 
+              await to<IElementUpdated>(update_element.runUpdateElement());
+
+              if (err) {
+                Handlers.onError(res, 'Internal Error');
+                return resolve();
+              }
+
+              if (element_updated.big_mistake != EUpdateError.ERR_NONE) {
+                switch (element_updated.big_mistake) {
+                  case EUpdateError.ERR_CREATE:
+                    errors.push('Internal error when creating preference fuels');
+                  break;
+        
+                  case EUpdateError.ERR_DELETE:
+                      errors.push('Internal error when updating preference fuels');
+                  break;
+                }
+              } else {
+                success['user_preference_fuels'] = element_updated.element_updated;
+              }
+            } else {
+              const [err_fuel_preference, success_fuel_preference] = 
+              await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
+  
+              if (!err_fuel_preference) {
+                success['user_preference_fuels'] = success_fuel_preference;
+              } 
+            }
+            
+            if (user['password']) {
+              const user_for_authenticate = {id: success.id, email: success.email,
+                password: user['password'], username: success.username}
+              const token = Authenticate.getToken(user_for_authenticate);
+              
+              success['token'] = token;
+            }
+
+            Handlers.onSuccess(res, {user: success, msg: errors});
+            return resolve();
           } else {
-            const [err_fuel_preference, success_fuel_preference] = 
-            await to<IFuelDetail[]>(FuelPreference.readByUser(user_id));
-
-            if (!err_fuel_preference) {
-              success['user_preference_fuels'] = success_fuel_preference;
-            } 
+            Handlers.authFail(req, res);
+            return resolve();
           }
-
-          Handlers.onSuccess(res, {user: success, msg: errors});
-          resolve();
         }
       }
     });
@@ -211,11 +272,11 @@ class UserController {
           
           if (err) {
             Handlers.dbErrorHandler(res, err);
-            resolve();
+            return resolve();
           }
 
           Handlers.onSuccess(res, user);
-          resolve();
+          return resolve();
         }
       }
     });
@@ -230,7 +291,7 @@ class UserController {
         
         if (err) {
           Handlers.dbErrorHandler(res, err)
-          resolve();
+          return resolve();
         }
   
         const redis = new Redis();
@@ -238,7 +299,7 @@ class UserController {
     
         if (err_token || !user || !user.id) {
           Handlers.onError(res, 'It was not possible to generate the token');
-          resolve();
+          return resolve();
         }
   
         redis.createRecoverPassword(token, user.id.toString());
@@ -248,14 +309,14 @@ class UserController {
       
         if (err_email) {
           Handlers.onError(res, 'It was not possible to send the email');
-          resolve();
+          return resolve();
         }
   
         Handlers.onSuccess(res, 'E-mail sent');
-        resolve();
+        return resolve();
       } else {
         Handlers.onError(res, 'E-mail/Phone number and password are required');
-        resolve();
+        return resolve();
       }
     });
   }
@@ -282,7 +343,7 @@ class UserController {
     Handlers.sendToken(res, user);
   }
 
-  public activateAccout = async (req: Request, res: Response) => {
+  public activateAccount = async (req: Request, res: Response) => {
     const [errToken, user] =
       await to<IUserForAuthorization>(Authenticate.getJwtPayload(req.params.token));
 
@@ -299,6 +360,17 @@ class UserController {
     }
 
     Handlers.onSuccess(res, {user: success});
+  }
+
+  public verifyExistenceCredentials = async (req: Request, res: Response) => {
+    const {email, username} = req.body;
+    const [err, result] = await to<Object>(User.verifyExistenceCredentials(username, email));
+
+    if (err) {
+      console.log(err);
+    }
+
+    Handlers.onSuccess(res, {use_of_credentials: result});
   }
 }
 

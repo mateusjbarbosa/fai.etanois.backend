@@ -1,4 +1,4 @@
-import { Application} from 'express';
+import { Application, Request, Response, NextFunction } from 'express';
 import { RouterModuleFactory} from './router-map';
 import { HttpVerbMap, FeatureModuleRouterInfo, ModuleEndpointMap } from './base-routes-module';
 
@@ -43,10 +43,21 @@ export class RouterModule {
       if(routerInfo) {
         const {isProtected, callback, endpoint} = routerInfo;
         isProtected 
-          ? this.express.route(endpoint).all(authenticate())[resgistredVeb](callback)
-          : this.express.route(endpoint)[resgistredVeb](callback);
+          ? this.express.route(endpoint).all(authenticate())[resgistredVeb]
+            (this.printRequestRoute ,callback)
+          : this.express.route(endpoint)[resgistredVeb](this.printRequestRoute, callback);
 
         console.log(`${resgistredVeb}: ${endpoint} | isProtected: ${isProtected}`);
       }
+  }
+
+  private printRequestRoute(req: Request, res: Response, next: NextFunction): void {
+    console.log(`\nURL:${req.url}`)
+
+    if (req.user) {
+      console.log(`User: ${req.user[`username`]}`)
+    }
+
+    next();
   }
 }

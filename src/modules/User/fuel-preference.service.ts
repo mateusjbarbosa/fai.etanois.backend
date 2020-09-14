@@ -1,8 +1,6 @@
-import { IFuel, IFuelDetail } from "../Fuel/fuel.module";
+import { IFuelDetail } from "../Fuel/fuel.module";
 import { IUserPreferenceFuel, create, createFuelDetail } from './fuel-preference.module'
 import { to } from "../../core/util/util";
-import Fuel from '../Fuel/fuel.service';
-const { Op } = require("sequelize");
 const model = require('../../entities');
 
 class FuelPreference {

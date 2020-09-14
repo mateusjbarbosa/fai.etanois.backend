@@ -1,18 +1,18 @@
 import * as nodemailer from 'nodemailer'
+import Configuration from '../../config/config'
 
 class Nodemailer {
   private transporter;
-  private source = 'Etanóis <joaovitorteixeira10.jvt@gmail.com>';
+  private source = `Etanóis ${Configuration.email.auth.user}`;
 
   constructor() {
+    const info_email = Configuration.email;
+
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'joaovitorteixeira10.jvt@gmail.com',
-        pass: 'teste',
-      }
+      host: info_email.host,
+      port: info_email.port,
+      secure: info_email.secure,
+      auth: info_email.auth,
     });
   }
 

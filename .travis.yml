@@ -18,4 +18,4 @@ before_script:
   - gulp
 script:
   - npm run unit-test
-  - npm run integration-test
+after_success: npm run unit-coverage

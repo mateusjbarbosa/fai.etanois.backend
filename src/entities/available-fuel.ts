@@ -1,7 +1,7 @@
 import { getAvailableFuels } from '../modules/Fuel/fuel.module';
 
 module.exports = function (sequelize, DataTypes) {
-  const UserPreferenceFuel = sequelize.define('UserPreferenceFuel', {
+  const AvailableFuel = sequelize.define('AvailableFuel', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -23,23 +23,38 @@ module.exports = function (sequelize, DataTypes) {
           msg: 'Invalid fuel'
         }
       },
-      unique: 'userPreference'
+      unique: 'availableFuel'
     },
-    user_id: {
+    fuel_station_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notEmpty: {
           args: true,
-          msg: 'User ID cannot be empy'
+          msg: 'Fuel station cannot be empty'
         },
         notNull: {
-          msg: 'User ID is required'
+          msg: 'Fuel station is required'
         }
       },
-      unique: 'userPreference'
+      unique: 'availableFuel'
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          args: true,
+          msg: 'Price cannot be empty'
+        },
+        notNull: {
+          args: true,
+          msg: 'Price is required'
+        },
+        min: 0
+      }
     }
   });
 
-  return UserPreferenceFuel;
+  return AvailableFuel;
 }
