@@ -59,7 +59,7 @@ class FuelStationAvailableFuelController {
 
         Handlers.onError(res, message_err);
       } else {
-        Handlers.onSuccess(res, { available_services: element_updated.element_updated, msg: errors });
+        Handlers.onSuccess(res, { available_fuels: element_updated.element_updated, msg: errors });
       }
 
       return resolve();
