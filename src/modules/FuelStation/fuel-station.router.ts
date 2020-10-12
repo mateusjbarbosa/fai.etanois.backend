@@ -39,6 +39,11 @@ export class FuelStationRouterModule extends BaseRouterModule {
           isProtected: true
         },
         {
+          endpoint: this.baseEndpoint + 'read-by-coordinate/:lat/:lng/:radius/:page',
+          callback: FuelStationController.readByCoordinates,
+          isProtected: true
+        },
+        {
           endpoint: this.baseEndpoint + 'read-all-flags',
           callback: FuelStationController.readAllFlag,
           isProtected: true
@@ -47,7 +52,7 @@ export class FuelStationRouterModule extends BaseRouterModule {
           endpoint: this.baseEndpoint + 'read-all-available-services',
           callback: FuelStationAvailableServiceController.readAllAvailableServices,
           isProtected: true
-        }
+        },
       ]
     }
   }

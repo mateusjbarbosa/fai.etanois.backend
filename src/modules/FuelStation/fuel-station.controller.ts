@@ -4,7 +4,7 @@ import Geocoding from '../../core/geocoding/geocoding.service';
 import { Request, Response } from 'express';
 import { to, trimAll, ICep, isCEP } from '../../core/util/util';
 import { shortNameToLongName, ESupportedCountry } from '../../core/util/util.states';
-import { IFuelStationDetail, IManyFuelStations, getAllFlagOfFuelStation } 
+import { IFuelStationDetail, IManyFuelStations, getAllFlagOfFuelStation }
   from './fuel-station.module';
 import { LatLngLiteral } from "@googlemaps/google-maps-services-js";
 
@@ -45,7 +45,7 @@ class FuelStationController {
       body['state'] = state;
       body['lat'] = success_geocoding.lat;
       body['lng'] = success_geocoding.lng;
-      
+
       const [err_create_fuel_station, fuel_station] = await to<IFuelStationDetail>(
         FuelStation.create(body));
 
@@ -84,6 +84,7 @@ class FuelStationController {
 
       if (page < 1) {
         Handlers.onError(res, 'The page must be greater than or equal to 1')
+        return resolve();
       }
 
       const [err_read_fuel_stations, fuel_stations] = await to<IManyFuelStations>(
@@ -102,7 +103,32 @@ class FuelStationController {
   public readAllFlag = async (req: Request, res: Response) => {
     const flags: string[] = getAllFlagOfFuelStation();
 
-    Handlers.onSuccess(res, {flags: flags})
+    Handlers.onSuccess(res, { flags: flags })
+  }
+
+  public readByCoordinates = async (req: Request, res: Response) => {
+    return new Promise(async resolve => {
+      const page = parseInt(req.params.page);
+      const radius = parseInt(req.params.radius);
+      const lat = parseFloat(req.params.lat);
+      const lng = parseFloat(req.params.lng);
+
+      if (page < 1) {
+        Handlers.onError(res, 'The page must be greater than or equal to 1');
+        return resolve();
+      }
+
+      const [err_read_fuel_stations, fuel_stations] = await to<IManyFuelStations>(
+        FuelStation.readByCoordinates(lat, lng, radius, page));
+
+      if (err_read_fuel_stations) {
+        Handlers.dbErrorHandler(res, err_read_fuel_stations);
+        return resolve();
+      }
+
+      Handlers.onSuccess(res, fuel_stations);
+      return resolve();
+    });
   }
 }
 

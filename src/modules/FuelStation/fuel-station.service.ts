@@ -9,9 +9,11 @@ const model = require('../../entities');
 const { Op } = require("sequelize");
 
 class FuelStation {
-  private include_available_fuel_service = 
-    [ { model: model.AvailableFuel },
-      { model: model.AvailableService }]
+  private include_available_fuel_service =
+    [{ model: model.AvailableFuel },
+    { model: model.AvailableService }]
+  private fuel_station_by_page: number = 5;
+  private earth_radius = 6371;
   constructor() { }
 
   public async create(fuel: IFuelStation): Promise<IFuelStationDetail> {
@@ -51,7 +53,6 @@ class FuelStation {
   }
 
   public async readByUser(user_id: number, page: number): Promise<IManyFuelStations> {
-    const fuel_station_by_page: number = 5;
     let query = {};
 
     query['user_id'] = user_id;
@@ -61,8 +62,42 @@ class FuelStation {
       where: {
         [Op.and]: [query]
       },
-      offset: (page - 1) * fuel_station_by_page,
-      limit: fuel_station_by_page,
+      offset: (page - 1) * this.fuel_station_by_page,
+      limit: this.fuel_station_by_page,
+      include: this.include_available_fuel_service,
+      distinct: true
+    }));
+
+    if (err) {
+      throw err;
+    }
+
+    if (success) {
+      return (createManyFuelStations(success));
+    } else {
+      throw { errors: [{ message: 'There are no fuel stations' }] };
+    }
+  }
+
+  public async readByCoordinates(lat: number, lng: number, radius: number, page: number): Promise<IManyFuelStations> {
+    // This logic can be found in: https://www.movable-type.co.uk/scripts/latlong-db.html 
+    const min_lat = lat - radius / this.earth_radius * 180 / Math.PI;
+    const max_lat = lat + radius / this.earth_radius * 180 / Math.PI;
+    const min_lng = lng - radius / this.earth_radius * 180 / Math.PI / Math.cos(lat * Math.PI / 180);
+    const max_lng = lng + radius / this.earth_radius * 180 / Math.PI / Math.cos(lat * Math.PI / 180);
+
+    const [err, success] = await to<any>(model.FuelStation.findAndCountAll({
+      where: {
+        lat: {
+          [Op.between]: [min_lat, max_lat]
+        },
+        lng: {
+          [Op.between]: [min_lng, max_lng]
+        },
+        activate: true
+      },
+      offset: (page - 1) * this.fuel_station_by_page,
+      limit: this.fuel_station_by_page,
       include: this.include_available_fuel_service,
       distinct: true
     }));
