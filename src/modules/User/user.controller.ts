@@ -321,7 +321,7 @@ class UserController {
     });
   }
 
-  public recovryPassword = async (req: Request, res: Response) => {
+  public recoveryPassword = async (req: Request, res: Response) => {
     const token = req.params.token;
     const redis = new Redis();
 

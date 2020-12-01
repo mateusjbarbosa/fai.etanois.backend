@@ -4,12 +4,14 @@
   "description": "API para servir a aplicação mobile e web.",
   "main": "./bootstrap.ts",
   "scripts": {
+    "postinstall": "tsc",
     "start": "NODE_ENV=development ./node_modules/.bin/ts-node ./bootstrap.ts",
     "unit-test": "NODE_ENV=test mocha ./dist/src/tests/unit/unit.test.js",
     "integration-test": "NODE_ENV=test mocha ./dist/src/tests/integration/integration.test.js",
     "unit-coverage": "nyc --reporter=html npm run unit-test",
-    "production": "NODE_ENV=production ./node_modules/.bin/ts-node ./dist/bootstrap.js"
+    "production": "NODE_ENV=production node ./dist/bootstrap.js"
   },
+  "heroku-run-build-script": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mateusjbarbosa/fai.etanois.backend.git"
@@ -43,6 +45,7 @@
     "passport-jwt": "^4.0.0",
     "pg": "^8.3.0",
     "redis": "^3.0.2",
+    "sequelize": "^6.3.5",
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
@@ -66,7 +69,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "mocha": "^8.1.0",
     "nyc": "^15.1.0",
-    "sequelize": "^6.3.3",
+    "sequelize": "^6.3.5",
     "supertest": "^4.0.2",
     "testdouble": "^3.16.1",
     "ts-node": "^8.10.2",

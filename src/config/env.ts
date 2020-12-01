@@ -96,7 +96,7 @@ export class Envorimment {
     database: {
       username: process.env.DATABASE_USERNAME || "postgres",
       password: process.env.DATABASE_PASSWORD || "postgres",
-      database: "etanois",
+      database: process.env.DATABASE_NAME || "etanois",
       host: process.env.DATABASE_HOST || "postgres",
       dialect: "postgres"
     },
@@ -104,7 +104,7 @@ export class Envorimment {
       port: 6379,
       host: 'redis'
     },
-    serverPort: process.env.DATABASE_SERVER_PORT || "3000",
+    serverPort: process.env.PORT || "3000",
     secret: process.env.DATABASE_SECRET || "S3CR3T",
     email: {
       host: 'smtp.umbler.com',
@@ -116,7 +116,7 @@ export class Envorimment {
       }
     },
     api_maps: {
-      key: 'teste'
+      key: process.env.API_MAPS || 'test'
     }
   }];
   
