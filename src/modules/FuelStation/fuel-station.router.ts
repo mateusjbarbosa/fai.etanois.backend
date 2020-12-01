@@ -53,6 +53,13 @@ export class FuelStationRouterModule extends BaseRouterModule {
           callback: FuelStationAvailableServiceController.readAllAvailableServices,
           isProtected: true
         },
+      ],
+      delete: [
+        {
+          endpoint: this.baseEndpoint + ':id',
+          callback: FuelStationController.delete,
+          isProtected: true
+        }
       ]
     }
   }

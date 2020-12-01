@@ -130,6 +130,22 @@ class FuelStationController {
       return resolve();
     });
   }
+
+  public delete = async (req: Request, res: Response) => {
+    new Promise(async (resolve) => {
+      const fuel_station_id = parseInt(req.params.id);
+      
+      const [err, user] = await to<IFuelStationDetail>(FuelStation.delete(fuel_station_id));
+          
+      if (err) {
+        Handlers.dbErrorHandler(res, err);
+        return resolve();
+      }
+
+      Handlers.onSuccess(res, user);
+      return resolve();
+    });
+  }
 }
 
 export default new FuelStationController();

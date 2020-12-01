@@ -26,6 +26,26 @@ class FuelStation {
     return createFuelStation(success);
   }
 
+  public async delete(id: number): Promise<IFuelStationDetail>{
+    const fuel_station = {
+      id: id,
+      activate: false
+    }
+
+    const[err, success] = await to<any>(model.FuelStation.update(fuel_station, {
+      where: {id},
+      fields: ['activate'],
+      hooks: true,
+      individualHooks: true
+    }));
+
+    if (err) {
+      throw err
+    }
+
+    return (createFuelStation(success));
+  }
+
   public async readById(id_fuel_station: number, id_user_owner: number):
     Promise<IFuelStationDetail> {
     let query = {};
